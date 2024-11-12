@@ -14,7 +14,7 @@ from aiogram.fsm.context import FSMContext
 import requests
 from io import BytesIO
 import imageio.v2 as imageio
-from convertertoken import BOT_TOKEN
+from convertertoken import BOT_TOKEN, ADMIN_TAG, ADMIN_ID
 
 
 class RGBForm(StatesGroup):
@@ -220,7 +220,7 @@ async def process_cmyk_command(message: Message, state: FSMContext):
 
 @dp.message(F.text == '⚙️ Техподдержка')
 async def support(message: Message):
-    await message.reply('raptor_tag.t.me', reply_markup=main_keyboard)
+    await message.reply(f'{ADMIN_TAG}', reply_markup=main_keyboard)
 
 
 @dp.message(F.text == '🔽 Свернуть клавиатуру')
@@ -374,12 +374,12 @@ async def send_echo(message: Message):
 
 async def on_startup():
     bot_info = await bot.get_me()
-    await bot.send_message(5039450388, f'Бот @{bot_info.username} включён')
+    await bot.send_message(ADMIN_ID, f'Бот @{bot_info.username} включён')
 
 
 async def on_shutdown():
     bot_info = await bot.get_me()
-    await bot.send_message(5039450388, f'Бот @{bot_info.username} выключен')
+    await bot.send_message(ADMIN_ID, f'Бот @{bot_info.username} выключен')
 
 
 async def main():
