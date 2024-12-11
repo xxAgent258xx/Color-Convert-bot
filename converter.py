@@ -1,20 +1,20 @@
 import asyncio
-import datetime
+# import datetime
 import logging
-import os
+# import os
 from json import loads
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.enums.inline_query_result_type import InlineQueryResultType
-from aiogram.types import Message, FSInputFile, ReplyKeyboardRemove, InlineQuery, InlineQueryResultPhoto, \
+from aiogram.types import Message, FSInputFile, BufferedInputFile, ReplyKeyboardRemove, InlineQuery, InlineQueryResultPhoto, \
     InlineQueryResultArticle, InputTextMessageContent
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 import requests
-from io import BytesIO
-import imageio.v2 as imageio
-from convertertoken import BOT_TOKEN, ADMIN_TAG, ADMIN_ID
+# from io import BytesIO
+# import imageio.v3 as imageio
+from convertertoken import BOT_TOKEN, ADMIN_ID
 
 
 class RGBForm(StatesGroup):
@@ -34,7 +34,8 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=storage)
 api_url = 'https://www.thecolorapi.com/id?'
-api_pic = 'https://www.thecolorapi.com/id?format=svg&named=false&'
+ans_url = 'https://whatcolor.ru/color/'
+ans_pic = 'https://via.placeholder.com/500x500/'
 main_keyboard = types.ReplyKeyboardMarkup(keyboard=[
     [types.KeyboardButton(text='🎨 Из RGB'), types.KeyboardButton(text='🎨 Из CMYK'),
      types.KeyboardButton(text='🎨 Из HEX')],
@@ -46,7 +47,7 @@ main_keyboard = types.ReplyKeyboardMarkup(keyboard=[
 @dp.message(Command(commands=['start', 'help']))
 async def process_start_command(message: Message):
     await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
-                        'Нажмите на кнопку снизу а затем введите значения⌨️\n'
+                        'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
                         'Или напишите / или @ColorConvertBot, цветовую модель, а затем значения✍️\n\n'
                         'Например: 🔍\n'
                         '/hex FFFFFF\n'
@@ -62,18 +63,25 @@ async def process_hex_command(message: Message):
         _, hex = message.text.split()
         if len(hex) == 6 or len(hex) == 3:
             response = requests.get(f'{api_url}hex={hex}').json()
-            pic = requests.get(f'https://via.placeholder.com/500x500/{hex}/{hex}.png').content
-            image = imageio.imread(BytesIO(pic))
-            imageio.imwrite('output.png', image)
+            response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+            response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+            response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+            response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+            response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
-            await message.reply_photo(photo=FSInputFile('output.png'), caption=
-            f'✨HEX: {response['hex']['value']}\n'
-            f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-            f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-            f'✨https://whatcolor.ru/color/{response['hex']['clean']}', reply_markup=main_keyboard)
+            await message.reply_photo(photo=BufferedInputFile(
+                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                'output.png'), caption=
+                                      f'✨HEX: {response['hex']['value']}\n'
+                                      f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                      f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                      f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
-    except:
+    except Exception as e:
+        print(e)
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
 
 
@@ -83,19 +91,24 @@ async def process_rgb_command(message: Message):
         _, r, g, b = message.text.split()
         if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
             response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
-            pic = requests.get(
-                f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.png').content
-            image = imageio.imread(BytesIO(pic))
-            imageio.imwrite('output.png', image)
+            response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+            response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+            response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+            response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+            response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
-            await message.reply_photo(photo=FSInputFile('output.png'), caption=
+            
+            await message.reply_photo(photo=BufferedInputFile(requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content, 'output.png'), caption=
             f'✨HEX: {response['hex']['value']}\n'
-            f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-            f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-            f'✨https://whatcolor.ru/color/{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨RGB: {response_r} {response_g} {response_b}\n'
+            f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
-    except:
+    except Exception as e:
+        print(e)
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
 
 
@@ -105,41 +118,42 @@ async def process_cmyk_command(message: Message):
         _, c, m, y, k = message.text.split()
         if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
             response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
-            pic = requests.get(
-                f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.png').content
-            image = imageio.imread(BytesIO(pic))
-            imageio.imwrite('output.png', image)
+            response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+            response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+            response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+            response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+            response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
-            await message.reply_photo(photo=FSInputFile('output.png'), caption=
+            await message.reply_photo(photo=BufferedInputFile(
+                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                'output.png'), caption=
             f'✨HEX: {response['hex']['value']}\n'
-            f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-            f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-            f'✨https://whatcolor.ru/color/{response['hex']['clean']}', reply_markup=main_keyboard)
-
+            f'✨RGB: {response_r} {response_g} {response_b}\n'
+            f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
-    except:
+    except Exception as e:
+        print(e)
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
 
 
 @dp.message(Command(commands=['year']))
 async def process_year_command(message: Message):
     try:
-        pic = requests.get(
-            f'https://via.placeholder.com/500x500/A47864/A47864.png').content
-        image = imageio.imread(BytesIO(pic))
-        imageio.imwrite('output.png', image)
-
-        await message.reply_photo(photo=FSInputFile('output.png'), caption=f'✨Pantone: 17-1230\n'
-                                                                           f'✨HEX: #A47864\n'
-                                                                           f'✨RGB: 164 120 100\n'
-                                                                           f'✨CMYK: 0 27 39 36\n'
-                                                                           f'✨https://whatcolor.ru/color/A47864',
+        await message.reply_photo(photo=FSInputFile('year.png'),
+                                  caption=f'✨Pantone: 17-1230\n'
+                                          f'✨HEX: #A47864\n'
+                                          f'✨RGB: 164 120 100\n'
+                                          f'✨CMYK: 0 27 39 36\n'
+                                          f'✨https://whatcolor.ru/color/A47864',
                                   reply_markup=main_keyboard)
 
-    except:
+    except Exception as e:
         await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
-
+        print(e)
 
 @dp.message(F.text == '🎨 Из RGB')
 async def button_rgb(message: Message, state: FSMContext):
@@ -154,16 +168,21 @@ async def process_rgb_command(message: Message, state: FSMContext):
         r, g, b = map(int, form['count'].split())
         if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
             response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
-            pic = requests.get(
-                f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.png').content
-            image = imageio.imread(BytesIO(pic))
-            imageio.imwrite('output.png', image)
+            response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+            response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+            response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+            response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+            response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
-            await message.reply_photo(photo=FSInputFile('output.png'), caption=
+            await message.reply_photo(photo=BufferedInputFile(
+                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                'output.png'), caption=
             f'✨HEX: {response['hex']['value']}\n'
-            f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-            f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-            f'✨https://whatcolor.ru/color/{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨RGB: {response_r} {response_g} {response_b}\n'
+            f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
             await state.clear()
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
@@ -187,20 +206,27 @@ async def process_hex_command(message: Message, state: FSMContext):
         hex = form['count']
         if len(hex) == 6 or len(hex) == 3:
             response = requests.get(f'{api_url}hex={hex}').json()
-            pic = requests.get(f'https://via.placeholder.com/500x500/{hex}/{hex}.png').content
-            image = imageio.imread(BytesIO(pic))
-            imageio.imwrite('output.png', image)
+            response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+            response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+            response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+            response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+            response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
-            await message.reply_photo(photo=FSInputFile('output.png'), caption=
+            await message.reply_photo(photo=BufferedInputFile(
+                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                'output.png'), caption=
             f'✨HEX: {response['hex']['value']}\n'
-            f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-            f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-            f'✨https://whatcolor.ru/color/{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨RGB: {response_r} {response_g} {response_b}\n'
+            f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
             await state.clear()
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
             await state.clear()
-    except:
+    except Exception as e:
+        print(e)
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
         await state.clear()
 
@@ -218,37 +244,39 @@ async def process_cmyk_command(message: Message, state: FSMContext):
         c, m, y, k = map(int, form['count'].split())
         if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
             response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
-            pic = requests.get(
-                f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.png').content
-            image = imageio.imread(BytesIO(pic))
-            imageio.imwrite('output.png', image)
+            response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+            response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+            response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+            response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+            response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+            response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
-            await message.reply_photo(photo=FSInputFile('output.png'), caption=
+            await message.reply_photo(photo=BufferedInputFile(
+                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                'output.png'), caption=
             f'✨HEX: {response['hex']['value']}\n'
-            f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-            f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-            f'✨https://whatcolor.ru/color/{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨RGB: {response_r} {response_g} {response_b}\n'
+            f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
             await state.clear()
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
             await state.clear()
-    except:
+    except Exception as e:
+        print(e)
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
         await state.clear()
 
 
 @dp.message(F.text == '🌈Цвет 2025 года')
 async def color_of_year(message: Message):
-    pic = requests.get(
-        f'https://via.placeholder.com/500x500/A47864/A47864.png').content
-    image = imageio.imread(BytesIO(pic))
-    imageio.imwrite('output.png', image)
-
-    await message.reply_photo(photo=FSInputFile('output.png'), caption=f'✨Pantone: 17-1230\n'
-                                                                       f'✨HEX: #A47864\n'
-                                                                       f'✨RGB: 164 120 100\n'
-                                                                       f'✨CMYK: 0 27 39 36\n'
-                                                                       f'✨https://whatcolor.ru/color/A47864',
+    await message.reply_photo(photo=FSInputFile('year.png'),
+                              caption=f'✨Pantone: 17-1230\n'
+                                      f'✨HEX: #A47864\n'
+                                      f'✨RGB: 164 120 100\n'
+                                      f'✨CMYK: 0 27 39 36\n'
+                                      f'✨https://whatcolor.ru/color/A47864',
                               reply_markup=main_keyboard)
 
 
@@ -261,7 +289,7 @@ async def hide_keyboard(message: Message):
 @dp.message(F.text == '🔙 Главное меню')
 async def process_start_command(message: Message):
     await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
-                        'Нажмите на кнопку снизу а затем введите значения⌨️\n'
+                        'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
                         'Или напишите / или @ColorConvertBot, цветовую модель, а затем значения✍️\n\n'
                         'Например: 🔍\n'
                         '/hex FFFFFF\n'
@@ -282,22 +310,27 @@ async def inline_mode(inline_query: InlineQuery):
             r, g, b = scheme[1], scheme[2], scheme[3]
             if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
                 response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
-                pic = requests.get(
-                    f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg').content
+                response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+                response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+                response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
                 await bot.answer_inline_query(query_id,
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
                                                   id=str(int(query_id) + 1),
-                                                  photo_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
+                                                  photo_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
+                                                  thumbnail_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
                                                   caption=f'✨HEX: {response['hex']['value']}\n'
-                                                          f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                          f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-                                                          f'✨https://whatcolor.ru/color/{response['hex']['clean']}',
+                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                          f'✨{ans_url}{response['hex']['clean']}',
                                                   title=f'С фото',
                                                   description=f'HEX: {response['hex']['value']}\n'
-                                                              f'RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                              f'CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}'
+                                                              f'RGB: {response_r} {response_g} {response_b}\n'
+                                                              f'CMYK: {response_c} {response_m} {response_y} {response_k}'
                                               ),
                                                   InlineQueryResultArticle(
                                                       id=str(int(query_id) + 2),
@@ -305,36 +338,41 @@ async def inline_mode(inline_query: InlineQuery):
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
                                                           message_text=f'✨HEX: {response['hex']['value']}\n'
-                                                                       f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                                       f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-                                                                       f'✨https://whatcolor.ru/color/{response['hex']['clean']}'),
+                                                                       f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                                       f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                                       f'✨{ans_url}{response['hex']['clean']}'),
                                                       # thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
                                                       hide_url=True,
                                                       description=f'HEX: {response['hex']['value']}\n'
-                                                                  f'RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                                  f'CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}',
+                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
+                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}',
                                                   )])
 
         elif scheme[0].lower() == 'hex':
             hex = scheme[1]
             if len(hex) == 6 or len(hex) == 3:
                 response = requests.get(f'{api_url}hex={hex}').json()
-                pic = requests.get(
-                    f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg').content
+                response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+                response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+                response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
                 await bot.answer_inline_query(query_id,
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
                                                   id=str(int(query_id) + 1),
-                                                  photo_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
+                                                  photo_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
+                                                  thumbnail_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
                                                   caption=f'✨HEX: {response['hex']['value']}\n'
-                                                          f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                          f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-                                                          f'✨https://whatcolor.ru/color/{response['hex']['clean']}',
+                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                          f'✨{ans_url}{response['hex']['clean']}',
                                                   title=f'С фото',
                                                   description=f'HEX: {response['hex']['value']}\n'
-                                                              f'RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                              f'CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}'
+                                                              f'RGB: {response_r} {response_g} {response_b}\n'
+                                                              f'CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                                               ),
                                                   InlineQueryResultArticle(
                                                       id=str(int(query_id) + 2),
@@ -342,22 +380,26 @@ async def inline_mode(inline_query: InlineQuery):
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
                                                           message_text=f'✨HEX: {response['hex']['value']}\n'
-                                                                       f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                                       f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-                                                                       f'✨https://whatcolor.ru/color/{response['hex']['clean']}'),
-                                                      # thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
+                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                          f'✨{ans_url}{response['hex']['clean']}'),
                                                       hide_url=True,
                                                       description=f'HEX: {response['hex']['value']}\n'
-                                                                  f'RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                                  f'CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}',
+                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
+                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}\n',
                                                   )])
 
         elif scheme[0].lower() == 'cmyk':
             c, m, y, k = scheme[1], scheme[2], scheme[3], scheme[4]
             if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
                 response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
-                pic = requests.get(
-                    f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg').content
+                response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
+                response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
+                response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
+                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
+                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
+                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
+                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
                 await bot.answer_inline_query(query_id,
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
@@ -365,13 +407,13 @@ async def inline_mode(inline_query: InlineQuery):
                                                   photo_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
                                                   thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
                                                   caption=f'✨HEX: {response['hex']['value']}\n'
-                                                          f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                          f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-                                                          f'✨https://whatcolor.ru/color/{response['hex']['clean']}',
+                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                          f'✨{ans_url}{response['hex']['clean']}',
                                                   title=f'С фото',
                                                   description=f'HEX: {response['hex']['value']}\n'
-                                                              f'RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                              f'CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}'
+                                                              f'RGB: {response_r} {response_g} {response_b}\n'
+                                                              f'CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                                               ),
                                                   InlineQueryResultArticle(
                                                       id=str(int(query_id) + 2),
@@ -379,14 +421,13 @@ async def inline_mode(inline_query: InlineQuery):
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
                                                           message_text=f'✨HEX: {response['hex']['value']}\n'
-                                                                       f'✨RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                                       f'✨CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}\n'
-                                                                       f'✨https://whatcolor.ru/color/{response['hex']['clean']}'),
-                                                      # thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
+                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                          f'✨{ans_url}{response['hex']['clean']}'),
                                                       hide_url=True,
                                                       description=f'HEX: {response['hex']['value']}\n'
-                                                                  f'RGB: {int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']} {int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['g']} {int(bool(response['rgb']['b'])) if response['rgb']['b'] is None else response['rgb']['b']}\n'
-                                                                  f'CMYK: {int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']} {int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']} {int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']} {int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']}',
+                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
+                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}\n',
                                                   )])
 
         elif scheme[0].lower() == 'year':
@@ -394,13 +435,13 @@ async def inline_mode(inline_query: InlineQuery):
                                           [InlineQueryResultPhoto(
                                               type=InlineQueryResultType.PHOTO,
                                               id=str(int(query_id) + 1),
-                                              photo_url=f'https://via.placeholder.com/500x500/A47864/A47864.jpeg',
-                                              thumbnail_url=f'https://via.placeholder.com/500x500/A47864/A47864.jpeg',
+                                              photo_url=f'{ans_pic}A47864/A47864.jpeg',
+                                              thumbnail_url=f'{ans_pic}A47864/A47864.jpeg',
                                               caption=f'✨Pantone: 17-1230\n'
                                                       f'✨HEX: #A47864\n'
                                                       f'✨RGB: 164 120 100\n'
                                                       f'✨CMYK: 0 27 39 36\n'
-                                                      f'✨https://whatcolor.ru/color/A47864',
+                                                      f'✨{ans_url}A47864',
                                               title=f'С фото',
                                               description=f'Pantone: 17-1230\n'
                                                           f'HEX: #A47864\n'
@@ -416,8 +457,7 @@ async def inline_mode(inline_query: InlineQuery):
                                                                    f'✨HEX: #A47864\n'
                                                                    f'✨RGB: 164 120 100\n'
                                                                    f'✨CMYK: 0 27 39 36\n'
-                                                                   f'✨https://whatcolor.ru/color/A47864'),
-                                                  # thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
+                                                                   f'✨{ans_url}A47864'),
                                                   hide_url=True,
                                                   description=f'Pantone: 17-1230\n'
                                                               f'HEX: #A47864\n'
