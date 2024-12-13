@@ -1,19 +1,15 @@
 import asyncio
-# import datetime
 import logging
-# import os
 from json import loads
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.enums.inline_query_result_type import InlineQueryResultType
-from aiogram.types import Message, FSInputFile, BufferedInputFile, ReplyKeyboardRemove, InlineQuery, InlineQueryResultPhoto, \
-    InlineQueryResultArticle, InputTextMessageContent
+from aiogram.types import Message, FSInputFile, BufferedInputFile, ReplyKeyboardRemove, InlineQuery, \
+    InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 import requests
-# from io import BytesIO
-# import imageio.v3 as imageio
 from convertertoken import BOT_TOKEN, ADMIN_ID
 
 
@@ -46,9 +42,10 @@ main_keyboard = types.ReplyKeyboardMarkup(keyboard=[
 
 @dp.message(Command(commands=['start', 'help']))
 async def process_start_command(message: Message):
+    bot_info = await bot.get_me()
     await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
                         'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
-                        'Или напишите / или @ColorConvertBot, цветовую модель, а затем значения✍️\n\n'
+                        f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
                         'Например: 🔍\n'
                         '/hex FFFFFF\n'
                         '/rgb 255 255 255\n'
@@ -288,9 +285,10 @@ async def hide_keyboard(message: Message):
 
 @dp.message(F.text == '🔙 Главное меню')
 async def process_start_command(message: Message):
+    bot_info = await bot.get_me()
     await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
                         'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
-                        'Или напишите / или @ColorConvertBot, цветовую модель, а затем значения✍️\n\n'
+                        f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
                         'Например: 🔍\n'
                         '/hex FFFFFF\n'
                         '/rgb 255 255 255\n'
