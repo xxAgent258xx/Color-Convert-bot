@@ -60,6 +60,7 @@ async def process_hex_command(message: Message):
         _, hex = message.text.split()
         if len(hex) == 6 or len(hex) == 3:
             response = requests.get(f'{api_url}hex={hex}').json()
+            response_hex = str(response['hex']['clean']).upper()
             response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
             response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
             response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -69,12 +70,12 @@ async def process_hex_command(message: Message):
             response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
             await message.reply_photo(photo=BufferedInputFile(
-                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
                 'output.png'), caption=
-            f'✨HEX: {response['hex']['value']}\n'
+            f'✨HEX: #{response_hex}\n'
             f'✨RGB: {response_r} {response_g} {response_b}\n'
             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
     except Exception as e:
@@ -89,6 +90,7 @@ async def process_rgb_command(message: Message):
         _, r, g, b = message.text.split()
         if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
             response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
+            response_hex = str(response['hex']['clean']).upper()
             response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
             response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
             response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -98,12 +100,12 @@ async def process_rgb_command(message: Message):
             response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
             await message.reply_photo(photo=BufferedInputFile(
-                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
                 'output.png'), caption=
-                                      f'✨HEX: {response['hex']['value']}\n'
+                                      f'✨HEX: #{response_hex}\n'
                                       f'✨RGB: {response_r} {response_g} {response_b}\n'
                                       f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                      f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+                                      f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
     except Exception as e:
@@ -118,6 +120,7 @@ async def process_cmyk_command(message: Message):
         _, c, m, y, k = message.text.split()
         if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
             response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
+            response_hex = str(response['hex']['clean']).upper()
             response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
             response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
             response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -127,12 +130,12 @@ async def process_cmyk_command(message: Message):
             response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
             await message.reply_photo(photo=BufferedInputFile(
-                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
                 'output.png'), caption=
-            f'✨HEX: {response['hex']['value']}\n'
+            f'✨HEX: #{response_hex}\n'
             f'✨RGB: {response_r} {response_g} {response_b}\n'
             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
     except Exception as e:
@@ -154,7 +157,7 @@ async def process_year_command(message: Message):
 
     except Exception as e:
         await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
-        print(e)
+        await bot.send_message(ADMIN_ID, f'{'@' + message.chat.username if message.chat.username else 'tg://openmessage?user_id=' + str(message.chat.id)}\n{e}')
 
 
 @dp.message(F.text == '🎨 Из RGB')
@@ -170,6 +173,7 @@ async def process_rgb_command(message: Message, state: FSMContext):
         r, g, b = map(int, form['count'].split())
         if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
             response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
+            response_hex = str(response['hex']['clean']).upper()
             response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
             response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
             response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -179,12 +183,12 @@ async def process_rgb_command(message: Message, state: FSMContext):
             response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
             await message.reply_photo(photo=BufferedInputFile(
-                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
                 'output.png'), caption=
-            f'✨HEX: {response['hex']['value']}\n'
+            f'✨HEX: #{response_hex}\n'
             f'✨RGB: {response_r} {response_g} {response_b}\n'
             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
             await state.clear()
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
@@ -209,6 +213,7 @@ async def process_hex_command(message: Message, state: FSMContext):
         hex = form['count']
         if len(hex) == 6 or len(hex) == 3:
             response = requests.get(f'{api_url}hex={hex}').json()
+            response_hex = str(response['hex']['clean']).upper()
             response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
             response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
             response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -218,12 +223,12 @@ async def process_hex_command(message: Message, state: FSMContext):
             response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
             await message.reply_photo(photo=BufferedInputFile(
-                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
                 'output.png'), caption=
-            f'✨HEX: {response['hex']['value']}\n'
+            f'✨HEX: #{response_hex}\n'
             f'✨RGB: {response_r} {response_g} {response_b}\n'
             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
             await state.clear()
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
@@ -248,6 +253,7 @@ async def process_cmyk_command(message: Message, state: FSMContext):
         c, m, y, k = map(int, form['count'].split())
         if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
             response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
+            response_hex = str(response['hex']['clean']).upper()
             response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
             response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
             response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -257,12 +263,12 @@ async def process_cmyk_command(message: Message, state: FSMContext):
             response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
             await message.reply_photo(photo=BufferedInputFile(
-                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
                 'output.png'), caption=
-            f'✨HEX: {response['hex']['value']}\n'
+            f'✨HEX: #{response_hex}\n'
             f'✨RGB: {response_r} {response_g} {response_b}\n'
             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
             await state.clear()
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
@@ -316,6 +322,7 @@ async def inline_mode(inline_query: InlineQuery):
             r, g, b = scheme[1], scheme[2], scheme[3]
             if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
                 response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
+                response_hex = str(response['hex']['clean']).upper()
                 response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
                 response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -331,14 +338,14 @@ async def inline_mode(inline_query: InlineQuery):
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
                                                   id=str(int(query_id) + 1),
-                                                  photo_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  thumbnail_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  caption=f'✨HEX: {response['hex']['value']}\n'
+                                                  photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  caption=f'✨HEX: #{response_hex}\n'
                                                           f'✨RGB: {response_r} {response_g} {response_b}\n'
                                                           f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                          f'✨{ans_url}{response['hex']['clean']}',
+                                                          f'✨{ans_url}{response_hex}',
                                                   title=f'С фото',
-                                                  description=f'HEX: {response['hex']['value']}\n'
+                                                  description=f'HEX: #{response_hex}\n'
                                                               f'RGB: {response_r} {response_g} {response_b}\n'
                                                               f'CMYK: {response_c} {response_m} {response_y} {response_k}'
                                               ),
@@ -347,13 +354,13 @@ async def inline_mode(inline_query: InlineQuery):
                                                       type=InlineQueryResultType.ARTICLE,
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
-                                                          message_text=f'✨HEX: {response['hex']['value']}\n'
+                                                          message_text=f'✨HEX: #{response_hex}\n'
                                                                        f'✨RGB: {response_r} {response_g} {response_b}\n'
                                                                        f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                       f'✨{ans_url}{response['hex']['clean']}'),
+                                                                       f'✨{ans_url}{response_hex}'),
                                                       # thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
                                                       hide_url=True,
-                                                      description=f'HEX: {response['hex']['value']}\n'
+                                                      description=f'HEX: #{response_hex}\n'
                                                                   f'RGB: {response_r} {response_g} {response_b}\n'
                                                                   f'CMYK: {response_c} {response_m} {response_y} {response_k}',
                                                   )])
@@ -362,6 +369,7 @@ async def inline_mode(inline_query: InlineQuery):
             hex = scheme[1]
             if len(hex) == 6 or len(hex) == 3:
                 response = requests.get(f'{api_url}hex={hex}').json()
+                response_hex = str(response['hex']['clean']).upper()
                 response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
                 response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -377,14 +385,14 @@ async def inline_mode(inline_query: InlineQuery):
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
                                                   id=str(int(query_id) + 1),
-                                                  photo_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  thumbnail_url=f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  caption=f'✨HEX: {response['hex']['value']}\n'
+                                                  photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  caption=f'✨HEX: #{response_hex}\n'
                                                           f'✨RGB: {response_r} {response_g} {response_b}\n'
                                                           f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                          f'✨{ans_url}{response['hex']['clean']}',
+                                                          f'✨{ans_url}{response_hex}',
                                                   title=f'С фото',
-                                                  description=f'HEX: {response['hex']['value']}\n'
+                                                  description=f'HEX: #{response_hex}\n'
                                                               f'RGB: {response_r} {response_g} {response_b}\n'
                                                               f'CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                                               ),
@@ -393,12 +401,12 @@ async def inline_mode(inline_query: InlineQuery):
                                                       type=InlineQueryResultType.ARTICLE,
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
-                                                          message_text=f'✨HEX: {response['hex']['value']}\n'
+                                                          message_text=f'✨HEX: #{response_hex}\n'
                                                                        f'✨RGB: {response_r} {response_g} {response_b}\n'
                                                                        f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                       f'✨{ans_url}{response['hex']['clean']}'),
+                                                                       f'✨{ans_url}{response_hex}'),
                                                       hide_url=True,
-                                                      description=f'HEX: {response['hex']['value']}\n'
+                                                      description=f'HEX: #{response_hex}\n'
                                                                   f'RGB: {response_r} {response_g} {response_b}\n'
                                                                   f'CMYK: {response_c} {response_m} {response_y} {response_k}\n',
                                                   )])
@@ -407,6 +415,7 @@ async def inline_mode(inline_query: InlineQuery):
             c, m, y, k = scheme[1], scheme[2], scheme[3], scheme[4]
             if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
                 response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
+                response_hex = str(response['hex']['clean']).upper()
                 response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
                 response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
@@ -422,14 +431,14 @@ async def inline_mode(inline_query: InlineQuery):
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
                                                   id=str(int(query_id) + 1),
-                                                  photo_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  thumbnail_url=f'https://via.placeholder.com/500x500/{response['hex']['clean']}/{response['hex']['clean']}.jpeg',
-                                                  caption=f'✨HEX: {response['hex']['value']}\n'
+                                                  photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  caption=f'✨HEX: #{response_hex}\n'
                                                           f'✨RGB: {response_r} {response_g} {response_b}\n'
                                                           f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                          f'✨{ans_url}{response['hex']['clean']}',
+                                                          f'✨{ans_url}{response_hex}',
                                                   title=f'С фото',
-                                                  description=f'HEX: {response['hex']['value']}\n'
+                                                  description=f'HEX: #{response_hex}\n'
                                                               f'RGB: {response_r} {response_g} {response_b}\n'
                                                               f'CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                                               ),
@@ -438,12 +447,12 @@ async def inline_mode(inline_query: InlineQuery):
                                                       type=InlineQueryResultType.ARTICLE,
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
-                                                          message_text=f'✨HEX: {response['hex']['value']}\n'
+                                                          message_text=f'✨HEX: #{response_hex}\n'
                                                                        f'✨RGB: {response_r} {response_g} {response_b}\n'
                                                                        f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                       f'✨{ans_url}{response['hex']['clean']}'),
+                                                                       f'✨{ans_url}{response_hex}'),
                                                       hide_url=True,
-                                                      description=f'HEX: {response['hex']['value']}\n'
+                                                      description=f'HEX: #{response_hex}\n'
                                                                   f'RGB: {response_r} {response_g} {response_b}\n'
                                                                   f'CMYK: {response_c} {response_m} {response_y} {response_k}\n',
                                                   )])
