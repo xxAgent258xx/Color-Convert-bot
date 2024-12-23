@@ -71,14 +71,15 @@ async def process_hex_command(message: Message):
             await message.reply_photo(photo=BufferedInputFile(
                 requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
                 'output.png'), caption=
-                                      f'✨HEX: {response['hex']['value']}\n'
-                                      f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                      f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                      f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+            f'✨HEX: {response['hex']['value']}\n'
+            f'✨RGB: {response_r} {response_g} {response_b}\n'
+            f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
     except Exception as e:
-        print(e)
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
 
 
@@ -96,16 +97,18 @@ async def process_rgb_command(message: Message):
             response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
 
-            
-            await message.reply_photo(photo=BufferedInputFile(requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content, 'output.png'), caption=
-            f'✨HEX: {response['hex']['value']}\n'
-            f'✨RGB: {response_r} {response_g} {response_b}\n'
-            f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-            f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
+            await message.reply_photo(photo=BufferedInputFile(
+                requests.get(f'{ans_pic}{response['hex']['clean']}/{response['hex']['clean']}.png').content,
+                'output.png'), caption=
+                                      f'✨HEX: {response['hex']['value']}\n'
+                                      f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                      f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                      f'✨{ans_url}{response['hex']['clean']}', reply_markup=main_keyboard)
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
     except Exception as e:
-        print(e)
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
 
 
@@ -133,7 +136,8 @@ async def process_cmyk_command(message: Message):
         else:
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
     except Exception as e:
-        print(e)
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
 
 
@@ -151,6 +155,7 @@ async def process_year_command(message: Message):
     except Exception as e:
         await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
         print(e)
+
 
 @dp.message(F.text == '🎨 Из RGB')
 async def button_rgb(message: Message, state: FSMContext):
@@ -185,7 +190,8 @@ async def process_rgb_command(message: Message, state: FSMContext):
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
             await state.clear()
     except Exception as e:
-        print(e)
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
         await state.clear()
 
@@ -223,7 +229,8 @@ async def process_hex_command(message: Message, state: FSMContext):
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
             await state.clear()
     except Exception as e:
-        print(e)
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
         await state.clear()
 
@@ -261,7 +268,8 @@ async def process_cmyk_command(message: Message, state: FSMContext):
             await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
             await state.clear()
     except Exception as e:
-        print(e)
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
         await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
         await state.clear()
 
@@ -311,10 +319,14 @@ async def inline_mode(inline_query: InlineQuery):
                 response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
                 response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
-                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
-                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
-                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
-                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
+                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk'][
+                    'c']
+                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk'][
+                    'm']
+                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk'][
+                    'y']
+                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk'][
+                    'k']
                 await bot.answer_inline_query(query_id,
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
@@ -353,10 +365,14 @@ async def inline_mode(inline_query: InlineQuery):
                 response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
                 response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
-                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
-                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
-                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
-                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
+                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk'][
+                    'c']
+                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk'][
+                    'm']
+                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk'][
+                    'y']
+                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk'][
+                    'k']
                 await bot.answer_inline_query(query_id,
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
@@ -378,9 +394,9 @@ async def inline_mode(inline_query: InlineQuery):
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
                                                           message_text=f'✨HEX: {response['hex']['value']}\n'
-                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                          f'✨{ans_url}{response['hex']['clean']}'),
+                                                                       f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                                       f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                                       f'✨{ans_url}{response['hex']['clean']}'),
                                                       hide_url=True,
                                                       description=f'HEX: {response['hex']['value']}\n'
                                                                   f'RGB: {response_r} {response_g} {response_b}\n'
@@ -394,10 +410,14 @@ async def inline_mode(inline_query: InlineQuery):
                 response_r = int(bool(response['rgb']['r'])) if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = int(bool(response['rgb']['g'])) if response['rgb']['g'] is None else response['rgb']['b']
                 response_b = int(bool(response['rgb']['b'])) if response['rgb']['g'] is None else response['rgb']['b']
-                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk']['c']
-                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk']['m']
-                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk']['y']
-                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk']['k']
+                response_c = int(bool(response['cmyk']['c'])) if response['cmyk']['c'] is None else response['cmyk'][
+                    'c']
+                response_m = int(bool(response['cmyk']['m'])) if response['cmyk']['m'] is None else response['cmyk'][
+                    'm']
+                response_y = int(bool(response['cmyk']['y'])) if response['cmyk']['y'] is None else response['cmyk'][
+                    'y']
+                response_k = int(bool(response['cmyk']['k'])) if response['cmyk']['k'] is None else response['cmyk'][
+                    'k']
                 await bot.answer_inline_query(query_id,
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
@@ -419,9 +439,9 @@ async def inline_mode(inline_query: InlineQuery):
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
                                                           message_text=f'✨HEX: {response['hex']['value']}\n'
-                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                          f'✨{ans_url}{response['hex']['clean']}'),
+                                                                       f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                                       f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                                       f'✨{ans_url}{response['hex']['clean']}'),
                                                       hide_url=True,
                                                       description=f'HEX: {response['hex']['value']}\n'
                                                                   f'RGB: {response_r} {response_g} {response_b}\n'
@@ -463,9 +483,9 @@ async def inline_mode(inline_query: InlineQuery):
                                                               f'CMYK: 0 27 39 36'
                                               )])
 
-
     except Exception as e:
-        print(e)
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
 
 
 @dp.message()
