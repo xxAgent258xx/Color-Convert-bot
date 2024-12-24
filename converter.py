@@ -80,7 +80,7 @@ async def process_hex_command(message: Message):
         else:
             await message.reply('Вы ввели недопустимое значение❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
 
-    except IndexError:
+    except ValueError:
         await message.reply('Вы ввели неверное количество значений❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
 
     except TelegramBadRequest as e:
@@ -119,7 +119,7 @@ async def process_rgb_command(message: Message):
         else:
             await message.reply('Вы ввели недопустимое значение❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
 
-    except IndexError:
+    except ValueError:
         await message.reply('Вы ввели неверное количество значений❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
 
     except TelegramBadRequest as e:
@@ -160,7 +160,7 @@ async def process_cmyk_command(message: Message):
         else:
             await message.reply('Вы ввели недопустимое значение❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
 
-    except IndexError:
+    except ValueError:
         await message.reply('Вы ввели неверное количество значений❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
 
     except TelegramBadRequest as e:
@@ -226,7 +226,7 @@ async def process_rgb_command(message: Message, state: FSMContext):
             await message.reply('Вы ввели недопустимое значение❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
             await state.clear()
 
-    except IndexError:
+    except ValueError:
         await message.reply('Вы ввели неверное количество значений❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
         await state.clear()
 
@@ -279,7 +279,7 @@ async def process_hex_command(message: Message, state: FSMContext):
             await message.reply('Вы ввели недопустимое значение❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
             await state.clear()
 
-    except IndexError:
+    except ValueError:
         await message.reply('Вы ввели неверное количество значений❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
         await state.clear()
 
@@ -333,7 +333,7 @@ async def process_cmyk_command(message: Message, state: FSMContext):
             await message.reply('Вы ввели недопустимое значение❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
             await state.clear()
 
-    except IndexError:
+    except ValueError:
         await message.reply('Вы ввели неверное количество значений❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
         await state.clear()
 
@@ -563,7 +563,7 @@ async def inline_mode(inline_query: InlineQuery):
                                                               f'CMYK: 0 27 39 36'
                                               )])
 
-    except IndexError:
+    except ValueError:
         pass
 
     except Exception as e:
@@ -573,7 +573,7 @@ async def inline_mode(inline_query: InlineQuery):
 
 @dp.message()
 async def send_echo(message: Message):
-    await message.reply('Я вас не понимаю😔')
+    await message.reply('Я вас не понимаю😔\nВведите или нажмите /start или /help, чтобы получить информацию.')
 
 
 async def on_startup():
