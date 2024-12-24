@@ -3,6 +3,7 @@ import logging
 from json import loads
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
+from aiogram.exceptions import *
 from aiogram.enums.inline_query_result_type import InlineQueryResultType
 from aiogram.types import Message, FSInputFile, BufferedInputFile, ReplyKeyboardRemove, InlineQuery, \
     InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent
@@ -77,11 +78,20 @@ async def process_hex_command(message: Message):
             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
             f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
         else:
-            await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
+            await message.reply('Вы ввели недопустимое значение❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
+
+    except IndexError:
+        await message.reply('Вы ввели неверное количество значений❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
+
+    except TelegramBadRequest as e:
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+        await message.reply('Telegram не смог отправить сообщение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.', reply_markup=main_keyboard)
+
     except Exception as e:
         await bot.send_message(ADMIN_ID,
                                f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
-        await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
+        await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
 
 
 @dp.message(Command(commands=['rgb']))
@@ -107,11 +117,22 @@ async def process_rgb_command(message: Message):
                                       f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                                       f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
         else:
-            await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
+            await message.reply('Вы ввели недопустимое значение❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
+
+    except IndexError:
+        await message.reply('Вы ввели неверное количество значений❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
+
+    except TelegramBadRequest as e:
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+        await message.reply(
+            'Telegram не смог отправить сообщение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
+            reply_markup=main_keyboard)
+
     except Exception as e:
         await bot.send_message(ADMIN_ID,
                                f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
-        await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
+        await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
 
 
 @dp.message(Command(commands=['cmyk']))
@@ -137,11 +158,22 @@ async def process_cmyk_command(message: Message):
             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
             f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
         else:
-            await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
+            await message.reply('Вы ввели недопустимое значение❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
+
+    except IndexError:
+        await message.reply('Вы ввели неверное количество значений❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
+
+    except TelegramBadRequest as e:
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+        await message.reply(
+            'Telegram не смог отправить сообщение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
+            reply_markup=main_keyboard)
+
     except Exception as e:
         await bot.send_message(ADMIN_ID,
                                f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
-        await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
+        await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
 
 
 @dp.message(Command(commands=['year']))
@@ -191,12 +223,25 @@ async def process_rgb_command(message: Message, state: FSMContext):
             f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
             await state.clear()
         else:
-            await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
+            await message.reply('Вы ввели недопустимое значение❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
             await state.clear()
+
+    except IndexError:
+        await message.reply('Вы ввели неверное количество значений❌\nRGB-значение состоит из 3 чисел от 0 до 255.', reply_markup=main_keyboard)
+        await state.clear()
+
+    except TelegramBadRequest as e:
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+        await message.reply(
+            'Telegram не смог отправить сообщение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
+            reply_markup=main_keyboard)
+        await state.clear()
+
     except Exception as e:
         await bot.send_message(ADMIN_ID,
                                f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
-        await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
+        await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
         await state.clear()
 
 
@@ -231,13 +276,27 @@ async def process_hex_command(message: Message, state: FSMContext):
             f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
             await state.clear()
         else:
-            await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
+            await message.reply('Вы ввели недопустимое значение❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
             await state.clear()
+
+    except IndexError:
+        await message.reply('Вы ввели неверное количество значений❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.', reply_markup=main_keyboard)
+        await state.clear()
+
+    except TelegramBadRequest as e:
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+        await message.reply(
+            'Telegram не смог отправить сообщение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
+            reply_markup=main_keyboard)
+        await state.clear()
+
     except Exception as e:
         await bot.send_message(ADMIN_ID,
                                f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
-        await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
+        await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
         await state.clear()
+
 
 
 @dp.message(F.text == '🎨 Из CMYK')
@@ -271,14 +330,26 @@ async def process_cmyk_command(message: Message, state: FSMContext):
             f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
             await state.clear()
         else:
-            await message.reply('Вы ввели недопустимое значение❌', reply_markup=main_keyboard)
+            await message.reply('Вы ввели недопустимое значение❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
             await state.clear()
+
+    except IndexError:
+        await message.reply('Вы ввели неверное количество значений❌\nCMYK-значение состоит из 4 чисел от 0 до 100.', reply_markup=main_keyboard)
+        await state.clear()
+
+    except TelegramBadRequest as e:
+        await bot.send_message(ADMIN_ID,
+                               f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+        await message.reply(
+            'Telegram не смог отправить сообщение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
+            reply_markup=main_keyboard)
+        await state.clear()
+
     except Exception as e:
         await bot.send_message(ADMIN_ID,
                                f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
-        await message.reply('Вы ввели неверное количество значений❌', reply_markup=main_keyboard)
+        await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
         await state.clear()
-
 
 @dp.message(F.text == '🌈Цвет 2025 года')
 async def color_of_year(message: Message):
@@ -314,9 +385,9 @@ async def process_start_command(message: Message):
 @dp.inline_query()
 async def inline_mode(inline_query: InlineQuery):
     try:
-        jsonquery = inline_query.json()
-        query: str = loads(jsonquery)['query']
-        query_id: str = loads(jsonquery)['id']
+        jsonquery = loads(str(inline_query))
+        query: str = jsonquery['query']
+        query_id: str = jsonquery['id']
         scheme: list[str] = query.split(' ')
         if scheme[0].lower() == 'rgb':
             r, g, b = scheme[1], scheme[2], scheme[3]
@@ -492,9 +563,12 @@ async def inline_mode(inline_query: InlineQuery):
                                                               f'CMYK: 0 27 39 36'
                                               )])
 
+    except IndexError:
+        pass
+
     except Exception as e:
         await bot.send_message(ADMIN_ID,
-                               f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
+                       f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
 
 
 @dp.message()
