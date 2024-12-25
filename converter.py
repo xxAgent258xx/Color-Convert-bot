@@ -50,7 +50,7 @@ async def process_start_command(message: Message):
                         'Например: 🔍\n'
                         '/hex FFFFFF\n'
                         '/rgb 255 255 255\n'
-                        '@ColorConvertBot cmyk 0 0 0 0',
+                        f'@{bot_info.username} cmyk 0 0 0 0',
                         reply_markup=main_keyboard
                         )
 
