@@ -4,7 +4,6 @@
 """
 
 import logging
-
 import aiohttp
 from aiohttp.web_exceptions import HTTPError
 
