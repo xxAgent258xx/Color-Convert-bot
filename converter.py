@@ -309,8 +309,8 @@ async def inline_mode(inline_query: InlineQuery):
 
         response_hex = str(response['hex']['clean']).upper()
         response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-        response_g = 0 if response['rgb']['g'] is None else response['rgb']['b']
-        response_b = 0 if response['rgb']['g'] is None else response['rgb']['b']
+        response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
+        response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
         response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
         response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
         response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
@@ -366,8 +366,8 @@ async def send_rgb_message(message: Message, response: dict):
 
     response_hex = str(response['hex']['clean']).upper()
     response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-    response_g = 0 if response['rgb']['g'] is None else response['rgb']['b']
-    response_b = 0 if response['rgb']['g'] is None else response['rgb']['b']
+    response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
+    response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
     response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
     response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
     response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
