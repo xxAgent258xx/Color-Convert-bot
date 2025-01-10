@@ -1,6 +1,10 @@
 import asyncio
 import logging
 from json import loads
+
+import aiohttp
+# from PIL import Image
+# from io import BytesIO
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.exceptions import *
@@ -66,7 +70,11 @@ async def process_hex_command(message: Message):
             reply_markup=main_keyboard)
     if hex:
         if len(hex) == 6 or len(hex) == 3:
-            response = requests.get(f'{api_url}hex={hex}').json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'{api_url}hex={hex}') as response_:
+                    response = await response_.json()
+                async with session.get(f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                    photo = await response_2.content.read()
             response_hex = str(response['hex']['clean']).upper()
             response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
             response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -76,13 +84,11 @@ async def process_hex_command(message: Message):
             response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
-                await message.reply_photo(photo=BufferedInputFile(
-                    requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
-                    'output.png'), caption=
-                f'✨HEX: #{response_hex}\n'
-                f'✨RGB: {response_r} {response_g} {response_b}\n'
-                f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'), caption=
+                    f'✨HEX: #{response_hex}\n'
+                    f'✨RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                    f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -115,7 +121,11 @@ async def process_rgb_command(message: Message):
                             reply_markup=main_keyboard)
     if r != False and g != False and b != False:
         if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
-            response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
+                    response = await response_.json()
+                async with session.get(f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                    photo = await response_2.content.read()
             response_hex = str(response['hex']['clean']).upper()
             response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
             response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -125,9 +135,7 @@ async def process_rgb_command(message: Message):
             response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
-                await message.reply_photo(photo=BufferedInputFile(
-                    requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
-                    'output.png'), caption=
+                await message.reply_photo(photo=BufferedInputFile(photo,'output.png'), caption=
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
@@ -165,7 +173,11 @@ async def process_cmyk_command(message: Message):
                             reply_markup=main_keyboard)
     if c != False and m != False and y != False and k != False:
         if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
-            response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'{api_url}cmyk={c},{m},{y},{k}') as response_:
+                    response = await response_.json()
+                async with session.get(f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                    photo = await response_2.content.read()
             response_hex = str(response['hex']['clean']).upper()
             response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
             response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -175,9 +187,7 @@ async def process_cmyk_command(message: Message):
             response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
-                await message.reply_photo(photo=BufferedInputFile(
-                    requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
-                    'output.png'), caption=
+                await message.reply_photo(photo=BufferedInputFile(photo,'output.png'), caption=
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
@@ -239,7 +249,11 @@ async def process_rgb_command(message: Message, state: FSMContext):
         await state.clear()
     if r != False and g != False and b != False:
         if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
-            response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
+                    response = await response_.json()
+                async with session.get(f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                    photo = await response_2.content.read()
             response_hex = str(response['hex']['clean']).upper()
             response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
             response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -249,9 +263,7 @@ async def process_rgb_command(message: Message, state: FSMContext):
             response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
-                await message.reply_photo(photo=BufferedInputFile(
-                    requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
-                    'output.png'), caption=
+                await message.reply_photo(photo=BufferedInputFile(photo,'output.png'), caption=
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
@@ -300,7 +312,11 @@ async def process_hex_command(message: Message, state: FSMContext):
         await state.clear()
     if hex != False:
         if len(hex) == 6 or len(hex) == 3:
-            response = requests.get(f'{api_url}hex={hex}').json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'{api_url}hex={hex}') as response_:
+                    response = await response_.json()
+                async with session.get(f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                    photo = await response_2.content.read()
             response_hex = str(response['hex']['clean']).upper()
             response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
             response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -310,9 +326,7 @@ async def process_hex_command(message: Message, state: FSMContext):
             response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
-                await message.reply_photo(photo=BufferedInputFile(
-                    requests.get(f'{ans_pic}{response_hex}/{response_hex}.png').content,
-                    'output.png'), caption=
+                await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'), caption=
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
@@ -337,8 +351,9 @@ async def process_hex_command(message: Message, state: FSMContext):
                 await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
                 await state.clear()
         else:
-            await message.reply('Вы ввели недопустимое значение❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.',
-                                reply_markup=main_keyboard)
+            await message.reply(
+                'Вы ввели недопустимое значение❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.',
+                reply_markup=main_keyboard)
             await state.clear()
 
 
@@ -360,7 +375,11 @@ async def process_cmyk_command(message: Message, state: FSMContext):
         await state.clear()
     if c != False and m != False and y != False and k != False:
         if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
-            response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'{api_url}cmyk={c},{m},{y},{k}') as response_:
+                    response = await response_.json()
+                async with session.get(f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                    photo = await response_2.content.read()
             response_hex = str(response['hex']['clean']).upper()
             response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
             response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -370,9 +389,7 @@ async def process_cmyk_command(message: Message, state: FSMContext):
             response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
-                await message.reply_photo(photo=BufferedInputFile(
-                    async_,
-                    'output.png'), caption=
+                await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'), caption=
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
@@ -443,7 +460,9 @@ async def inline_mode(inline_query: InlineQuery):
         if scheme[0].lower() == 'rgb':
             r, g, b = scheme[1], scheme[2], scheme[3]
             if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
-                response = requests.get(f'{api_url}rgb=rgb({r},{g},{b})').json()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
+                        response = await response_.json()
                 response_hex = str(response['hex']['clean']).upper()
                 response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -486,7 +505,9 @@ async def inline_mode(inline_query: InlineQuery):
         elif scheme[0].lower() == 'hex':
             hex = scheme[1]
             if len(hex) == 6 or len(hex) == 3:
-                response = requests.get(f'{api_url}hex={hex}').json()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f'{api_url}hex={hex}') as response_:
+                        response = await response_.json()
                 response_hex = str(response['hex']['clean']).upper()
                 response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
@@ -528,7 +549,9 @@ async def inline_mode(inline_query: InlineQuery):
         elif scheme[0].lower() == 'cmyk':
             c, m, y, k = scheme[1], scheme[2], scheme[3], scheme[4]
             if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
-                response = requests.get(f'{api_url}cmyk={c},{m},{y},{k}').json()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f'{api_url}cmyk={c},{m},{y},{k}') as response_:
+                        response = await response_.json()
                 response_hex = str(response['hex']['clean']).upper()
                 response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
                 response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
