@@ -1,0 +1,11 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  converter:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - /data:/data
