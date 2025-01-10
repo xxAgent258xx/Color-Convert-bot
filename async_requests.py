@@ -7,7 +7,6 @@ import logging
 import aiohttp
 from aiohttp.web_exceptions import HTTPError
 
-
 api_url = 'https://www.thecolorapi.com/id?'
 ans_url = 'https://whatcolor.ru/color/'
 ans_pic = 'https://via.placeholder.com/500x500/'
