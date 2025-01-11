@@ -33,7 +33,7 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=storage)
 ans_url = 'https://whatcolor.ru/color/'
-ans_pic = 'https://via.placeholder.com/500x500/'
+ans_pic = 'https://dummyimage.com/500x500/'
 main_keyboard = types.ReplyKeyboardMarkup(keyboard=[
     [types.KeyboardButton(text='🎨 Из RGB'), types.KeyboardButton(text='🎨 Из CMYK'),
      types.KeyboardButton(text='🎨 Из HEX')],
