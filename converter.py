@@ -618,22 +618,6 @@ async def inline_mode(inline_query: InlineQuery):
             await bot.send_message(ADMIN_ID,
                                    f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
 
-            await bot.answer_inline_query(query_id,
-                                          [InlineQueryResultArticle(
-                                                  id=str(int(query_id) + 2),
-                                                  type=InlineQueryResultType.ARTICLE,
-                                                  title=f'Без фото',
-                                                  input_message_content=InputTextMessageContent(
-                                                      message_text=f'✨HEX: #{response_hex}\n'
-                                                                   f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                                   f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                   f'✨{ans_url}{response_hex}'),
-                                                  hide_url=True,
-                                                  description=f'HEX: #{response_hex}\n'
-                                                              f'RGB: {response_r} {response_g} {response_b}\n'
-                                                              f'CMYK: {response_c} {response_m} {response_y} {response_k}\n',
-                                              )])
-
         try:
             if scheme[0].lower() == 'year':
                 await bot.answer_inline_query(query_id,
