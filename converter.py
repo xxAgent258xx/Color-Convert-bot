@@ -3,8 +3,6 @@ import logging
 from json import loads
 
 import aiohttp
-# from PIL import Image
-# from io import BytesIO
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.exceptions import *
@@ -14,7 +12,6 @@ from aiogram.types import Message, FSInputFile, BufferedInputFile, ReplyKeyboard
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-import requests
 from convertertoken import BOT_TOKEN, ADMIN_ID
 
 
@@ -36,7 +33,7 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=storage)
 api_url = 'https://www.thecolorapi.com/id?'
 ans_url = 'https://whatcolor.ru/color/'
-ans_pic = 'https://via.placeholder.com/500x500/'
+ans_pic = 'https://dummyimage.com/500x500/'
 main_keyboard = types.ReplyKeyboardMarkup(keyboard=[
     [types.KeyboardButton(text='🎨 Из RGB'), types.KeyboardButton(text='🎨 Из CMYK'),
      types.KeyboardButton(text='🎨 Из HEX')],
