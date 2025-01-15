@@ -575,10 +575,10 @@ async def inline_mode(inline_query: InlineQuery):
 
         except UnboundLocalError:
             pass
-        # except ValueError:
-        #     pass
-        # except IndexError:
-        #     pass
+        except ValueError:
+            pass
+        except IndexError:
+            pass
         except Exception as e:
             await bot.send_message(ADMIN_ID,
                                    f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
