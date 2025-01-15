@@ -460,13 +460,13 @@ async def hide_keyboard(message: Message):
 # Неотправленное сообщение вида "@botusername_bot system values", где system - rgb, hex, cmyk или year, values - r,g,b, hex или c,m,y,k в зависимости от system
 @dp.inline_query()
 async def inline_mode(inline_query: InlineQuery):
+    check = True
     scheme = []
     query_id = ''
     try:
-        jsonquery = loads(str(inline_query))
-        query: str = jsonquery['query']
-        query_id: str = jsonquery['id']
-        scheme: list[str] = query.split(' ')
+        query = str(inline_query)[str(inline_query).index("query='") + 7:str(inline_query).index("offset='") - 2]
+        query_id: str = inline_query.id
+        scheme: list[str] = query.split()
     except ValueError:
         pass
     except Exception as e:
@@ -480,179 +480,107 @@ async def inline_mode(inline_query: InlineQuery):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
                             response = await response_.json()
-                    response_hex = str(response['hex']['clean']).upper()
-                    response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-                    response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
-                    response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
-                    response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
-                    response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
-                    response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
-                    response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
-                    await bot.answer_inline_query(query_id,
-                                                  # Ответы в inline-режиме состоят из вариантов отправляемого сообщения и их вида на предпросмотре
-                                                  [InlineQueryResultPhoto(
-                                                      type=InlineQueryResultType.PHOTO,
-                                                      # id для каждого ответа должен быть уникальным (для конкретного бота, необязательно для всех), для этого удобно использовать id запроса, т.к. он изначально уникальный
-                                                      id=str(int(query_id) + 1),
-                                                      photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                      thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                      caption=f'✨HEX: #{response_hex}\n'
-                                                              f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                              f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                              f'✨{ans_url}{response_hex}',
-                                                      title=f'С фото',
-                                                      description=f'HEX: #{response_hex}\n'
-                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
-                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}'
-                                                  ),
-                                                      InlineQueryResultArticle(
-                                                          id=str(int(query_id) + 2),
-                                                          type=InlineQueryResultType.ARTICLE,
-                                                          title=f'Без фото',
-                                                          input_message_content=InputTextMessageContent(
-                                                              message_text=f'✨HEX: #{response_hex}\n'
-                                                                           f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                                           f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                           f'✨{ans_url}{response_hex}'),
-                                                          hide_url=True,
-                                                          description=f'HEX: #{response_hex}\n'
-                                                                      f'RGB: {response_r} {response_g} {response_b}\n'
-                                                                      f'CMYK: {response_c} {response_m} {response_y} {response_k}',
-                                                      )])
-        except Exception as e:
-            await bot.send_message(ADMIN_ID,
-                                   f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
-        try:
-            if scheme[0].lower() == 'hex':
-                hex = scheme[1]
-                if len(hex) == 6 or len(hex) == 3:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(f'{api_url}hex={hex}') as response_:
-                            response = await response_.json()
-                    response_hex = str(response['hex']['clean']).upper()
-                    response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-                    response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
-                    response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
-                    response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
-                    response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
-                    response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
-                    response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
-                    await bot.answer_inline_query(query_id,
-                                                  [InlineQueryResultPhoto(
-                                                      type=InlineQueryResultType.PHOTO,
-                                                      id=str(int(query_id) + 1),
-                                                      photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                      thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                      caption=f'✨HEX: #{response_hex}\n'
-                                                              f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                              f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                              f'✨{ans_url}{response_hex}',
-                                                      title=f'С фото',
-                                                      description=f'HEX: #{response_hex}\n'
-                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
-                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                  ),
-                                                      InlineQueryResultArticle(
-                                                          id=str(int(query_id) + 2),
-                                                          type=InlineQueryResultType.ARTICLE,
-                                                          title=f'Без фото',
-                                                          input_message_content=InputTextMessageContent(
-                                                              message_text=f'✨HEX: #{response_hex}\n'
-                                                                           f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                                           f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                           f'✨{ans_url}{response_hex}'),
-                                                          hide_url=True,
-                                                          description=f'HEX: #{response_hex}\n'
-                                                                      f'RGB: {response_r} {response_g} {response_b}\n'
-                                                                      f'CMYK: {response_c} {response_m} {response_y} {response_k}\n',
-                                                      )])
-        except Exception as e:
-            await bot.send_message(ADMIN_ID,
-                                   f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
+                elif scheme[0].lower() == 'hex':
+                    hex = scheme[1]
+                    if len(hex) == 6 or len(hex) == 3:
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'{api_url}hex={hex}') as response_:
+                                response = await response_.json()
+                elif scheme[0].lower() == 'cmyk':
+                    c, m, y, k = scheme[1], scheme[2], scheme[3], scheme[4]
+                    if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'{api_url}cmyk={c},{m},{y},{k}') as response_:
+                                response = await response_.json()
 
-        try:
-            if scheme[0].lower() == 'cmyk':
-                c, m, y, k = scheme[1], scheme[2], scheme[3], scheme[4]
-                if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(f'{api_url}cmyk={c},{m},{y},{k}') as response_:
-                            response = await response_.json()
-                    response_hex = str(response['hex']['clean']).upper()
-                    response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-                    response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
-                    response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
-                    response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
-                    response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
-                    response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
-                    response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
+                elif scheme[0].lower() == 'year':
                     await bot.answer_inline_query(query_id,
                                                   [InlineQueryResultPhoto(
                                                       type=InlineQueryResultType.PHOTO,
                                                       id=str(int(query_id) + 1),
-                                                      photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                      thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                      caption=f'✨HEX: #{response_hex}\n'
-                                                              f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                              f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                              f'✨{ans_url}{response_hex}',
+                                                      photo_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
+                                                      thumbnail_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
+                                                      caption=f'✨Pantone: {year_pantone}\n'
+                                                              f'✨HEX: #{year_hex}\n'
+                                                              f'✨RGB: {year_rgb}\n'
+                                                              f'✨CMYK: {year_cmyk}\n'
+                                                              f'✨{ans_url}{year_hex}',
                                                       title=f'С фото',
-                                                      description=f'HEX: #{response_hex}\n'
-                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
-                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                      description=f'Pantone: {year_pantone}\n'
+                                                                  f'HEX: #{year_hex}\n'
+                                                                  f'RGB: {year_rgb}\n'
+                                                                  f'CMYK: {year_cmyk}'
                                                   ),
                                                       InlineQueryResultArticle(
                                                           id=str(int(query_id) + 2),
                                                           type=InlineQueryResultType.ARTICLE,
                                                           title=f'Без фото',
                                                           input_message_content=InputTextMessageContent(
-                                                              message_text=f'✨HEX: #{response_hex}\n'
-                                                                           f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                                           f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                           f'✨{ans_url}{response_hex}'),
+                                                              message_text=f'✨Pantone: {year_pantone}\n'
+                                                                           f'✨HEX: #{year_hex}\n'
+                                                                           f'✨RGB: {year_rgb}\n'
+                                                                           f'✨CMYK: {year_cmyk}\n'
+                                                                           f'✨{ans_url}{year_hex}'),
                                                           hide_url=True,
-                                                          description=f'HEX: #{response_hex}\n'
-                                                                      f'RGB: {response_r} {response_g} {response_b}\n'
-                                                                      f'CMYK: {response_c} {response_m} {response_y} {response_k}\n',
+                                                          description=f'Pantone: {year_pantone}\n'
+                                                                      f'HEX: #{year_hex}\n'
+                                                                      f'RGB: {year_rgb}\n'
+                                                                      f'CMYK: {year_cmyk}'
                                                       )])
+                else:
+                    check = False
+        except ValueError:
+            pass
+        except IndexError:
+            pass
+        except TelegramBadRequest:
+            pass
         except Exception as e:
             await bot.send_message(ADMIN_ID,
                                    f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
-
         try:
-            if scheme[0].lower() == 'year':
+            if check and scheme[0].lower() != 'year':
+                response_hex = str(response['hex']['clean']).upper()
+                response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
+                response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
+                response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
+                response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
+                response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
+                response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
+                response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
                 await bot.answer_inline_query(query_id,
+                                              # Ответы в inline-режиме состоят из отправляемого сообщения и их вида на предпросмотре
                                               [InlineQueryResultPhoto(
                                                   type=InlineQueryResultType.PHOTO,
+                                                  # id для каждого ответа должен быть уникальным (для конкретного бота, необязательно для всех), для этого удобно использовать id запроса, т.к. он изначально уникальный
                                                   id=str(int(query_id) + 1),
-                                                  photo_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
-                                                  thumbnail_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
-                                                  caption=f'✨Pantone: {year_pantone}\n'
-                                                          f'✨HEX: #{year_hex}\n'
-                                                          f'✨RGB: {year_rgb}\n'
-                                                          f'✨CMYK: {year_cmyk}\n'
-                                                          f'✨{ans_url}{year_hex}',
+                                                  photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                                                  caption=f'✨HEX: #{response_hex}\n'
+                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                          f'✨{ans_url}{response_hex}',
                                                   title=f'С фото',
-                                                  description=f'Pantone: {year_pantone}\n'
-                                                              f'HEX: #{year_hex}\n'
-                                                              f'RGB: {year_rgb}\n'
-                                                              f'CMYK: {year_cmyk}'
+                                                  description=f'HEX: #{response_hex}\n'
+                                                              f'RGB: {response_r} {response_g} {response_b}\n'
+                                                              f'CMYK: {response_c} {response_m} {response_y} {response_k}'
                                               ),
                                                   InlineQueryResultArticle(
                                                       id=str(int(query_id) + 2),
                                                       type=InlineQueryResultType.ARTICLE,
                                                       title=f'Без фото',
                                                       input_message_content=InputTextMessageContent(
-                                                          message_text=f'✨Pantone: {year_pantone}\n'
-                                                                       f'✨HEX: #{year_hex}\n'
-                                                                       f'✨RGB: {year_rgb}\n'
-                                                                       f'✨CMYK: {year_cmyk}\n'
-                                                                       f'✨{ans_url}{year_hex}'),
+                                                          message_text=f'✨HEX: #{response_hex}\n'
+                                                                       f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                                                       f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                                                       f'✨{ans_url}{response_hex}'),
                                                       hide_url=True,
-                                                      description=f'Pantone: {year_pantone}\n'
-                                                                  f'HEX: #{year_hex}\n'
-                                                                  f'RGB: {year_rgb}\n'
-                                                                  f'CMYK: {year_cmyk}'
+                                                      description=f'HEX: #{response_hex}\n'
+                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
+                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}',
                                                   )])
+        except ValueError:
+            pass
         except Exception as e:
             await bot.send_message(ADMIN_ID,
                                    f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
