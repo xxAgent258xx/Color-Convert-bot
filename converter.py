@@ -463,6 +463,7 @@ async def inline_mode(inline_query: InlineQuery):
     check = True
     scheme = []
     query_id = ''
+    response = None
     try:
         query = str(inline_query)[str(inline_query).index("query='") + 7:str(inline_query).index("offset='") - 2]
         query_id: str = inline_query.id
