@@ -464,9 +464,9 @@ async def inline_mode(inline_query: InlineQuery):
     scheme = []
     query_id = ''
     try:
-        query = str(inline_query)[str(inline_query).index("query='") + 7:str(inline_query).index("offset='") - 2]
-        query_id: str = inline_query.id
-        scheme: list[str] = query.split()
+        query = inline_query.query
+        query_id = inline_query.id
+        scheme = query.split()
     except ValueError:
         pass
     except Exception as e:
@@ -481,22 +481,25 @@ async def inline_mode(inline_query: InlineQuery):
                         async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
                             response = await response_.json()
 
-                elif scheme[0].lower() == 'hex':
-                    hex = scheme[1]
-                    if len(hex) == 6 or len(hex) == 3:
-                        async with aiohttp.ClientSession() as session:
-                            async with session.get(f'{api_url}hex={hex}') as response_:
-                                response = await response_.json()
+            elif scheme[0].lower() == 'hex':
+                hex = scheme[1]
+                if len(hex) == 6 or len(hex) == 3:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'{api_url}hex={hex}') as response_:
+                            response = await response_.json()
 
-                elif scheme[0].lower() == 'cmyk':
-                    c, m, y, k = scheme[1], scheme[2], scheme[3], scheme[4]
-                    if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
-                        async with aiohttp.ClientSession() as session:
-                            async with session.get(f'{api_url}cmyk={c},{m},{y},{k}') as response_:
-                                response = await response_.json()
+            elif scheme[0].lower() == 'cmyk':
+                c, m, y, k = scheme[1], scheme[2], scheme[3], scheme[4]
+                if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'{api_url}cmyk=cmyk({c},{m},{y},{k})') as response_:
+                            response = await response_.json()
 
-                else:
-                    check = False
+            elif scheme[0].lower() == 'year':
+                pass
+
+            else:
+                check = False
 
             if check and scheme[0].lower() != 'year':
                 response_hex = str(response['hex']['clean']).upper()
