@@ -54,7 +54,7 @@ main_keyboard = ReplyKeyboardMarkup(keyboard=[
 
 # Приветственное сообщение
 @dp.message(F.text == '🔙 Главное меню')
-@dp.message(Command(commands=['start', 'help']))
+@dp.message(Command(commands=['start']))
 async def process_start_command(message: Message):
     bot_info = await bot.get_me()
     await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
@@ -64,6 +64,23 @@ async def process_start_command(message: Message):
                         '/hex FFFFFF\n'
                         '/rgb 255 255 255\n'
                         f'@{bot_info.username} cmyk 0 0 0 0',
+                        reply_markup=main_keyboard
+                        )
+
+
+# Полный список команд
+@dp.message(Command(commands=['help']))
+async def process_help_command(message: Message):
+    bot_info = await bot.get_me()
+    await message.reply(f'📋Полный список команд:\n'
+                        f'/start, /help\n'
+                        f'/hex HEX или @{bot_info.username} hex HEX,\n'
+                        f'где HEX - 3 или 6 символов от 0 до 9 и от A до F\n'
+                        f'/rgb R G B или @{bot_info.username} rgb R G B,\n'
+                        f'где R, G, B - числа от 0 до до 255\n'
+                        f'/cmyk C M Y K или @{bot_info.username} cmyk C M Y K,\n'
+                        f'где C, M, Y, K - числа от 0 до 100\n'
+                        f'/year или @{bot_info.username} year\n',
                         reply_markup=main_keyboard
                         )
 
