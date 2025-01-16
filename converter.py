@@ -73,14 +73,14 @@ async def process_start_command(message: Message):
 async def process_help_command(message: Message):
     bot_info = await bot.get_me()
     await message.reply(f'📋Полный список команд:\n'
-                        f'/start, /help\n'
+                        f'/start, /help;\n\n'
                         f'/hex HEX или @{bot_info.username} hex HEX,\n'
-                        f'где HEX - 3 или 6 символов от 0 до 9 и от A до F\n'
+                        f'где HEX - 3 или 6 символов от 0 до 9 и от A до F;\n\n'
                         f'/rgb R G B или @{bot_info.username} rgb R G B,\n'
-                        f'где R, G, B - числа от 0 до до 255\n'
+                        f'где R, G, B - числа от 0 до до 255;\n\n'
                         f'/cmyk C M Y K или @{bot_info.username} cmyk C M Y K,\n'
-                        f'где C, M, Y, K - числа от 0 до 100\n'
-                        f'/year или @{bot_info.username} year\n',
+                        f'где C, M, Y, K - числа от 0 до 100;\n\n'
+                        f'/year или @{bot_info.username} year;',
                         reply_markup=main_keyboard
                         )
 
