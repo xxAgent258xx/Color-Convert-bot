@@ -90,7 +90,7 @@ async def process_start_command(message: Message, command: CommandObject):
                                               f'✨ HEX: #{year_hex}\n'
                                               f'✨ RGB: {year_rgb}\n'
                                               f'✨ CMYK: {year_cmyk}\n\n'
-                                              f'⛓️ {ans_url}{year_hex}\n'
+                                              f'🔗 {ans_url}{year_hex}\n'
                                               f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                                       reply_markup=main_keyboard)
         else:
@@ -139,10 +139,20 @@ async def process_start_command(message: Message, command: CommandObject):
                                           f'✨ HEX: #{response_hex}\n'
                                           f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                           f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'🔗 {ans_url}{response_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
-            except UnboundLocalError or ValueError or IndexError:
+            except ValueError:
+                await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
+                                    'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
+                                    f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
+                                    'Например: 🔍\n'
+                                    '/hex FFFFFF\n'
+                                    '/rgb 255 255 255\n'
+                                    f'@{bot_info.username} cmyk 0 0 0 0',
+                                    reply_markup=main_keyboard
+                                    )
+            except IndexError:
                 await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
                                     'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
                                     f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
@@ -215,7 +225,7 @@ async def process_hex_command(message: Message):
                                           f'✨ HEX: #{response_hex}\n'
                                           f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                           f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'🔗 {ans_url}{response_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
             except TelegramBadRequest as e:
@@ -229,7 +239,7 @@ async def process_hex_command(message: Message):
                     f'✨ HEX: #{response_hex}\n'
                     f'✨ RGB: {response_r} {response_g} {response_b}\n'
                     f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'🔗 {ans_url}{response_hex}\n'
                     f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
 
@@ -278,7 +288,7 @@ async def process_rgb_command(message: Message):
                                           f'✨ HEX: #{response_hex}\n'
                                           f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                           f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'🔗 {ans_url}{response_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
             except TelegramBadRequest as e:
@@ -292,7 +302,7 @@ async def process_rgb_command(message: Message):
                     f'✨ HEX: #{response_hex}\n'
                     f'✨ RGB: {response_r} {response_g} {response_b}\n'
                     f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'🔗 {ans_url}{response_hex}\n'
                     f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
 
@@ -338,7 +348,7 @@ async def process_cmyk_command(message: Message):
                                           f'✨ HEX: #{response_hex}\n'
                                           f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                           f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'🔗 {ans_url}{response_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
             except TelegramBadRequest as e:
@@ -351,7 +361,7 @@ async def process_cmyk_command(message: Message):
                     f'✨ HEX: #{response_hex}\n'
                     f'✨ RGB: {response_r} {response_g} {response_b}\n'
                     f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'🔗 {ans_url}{response_hex}\n'
                     f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
 
@@ -376,7 +386,7 @@ async def process_year_command(message: Message):
                                           f'✨ HEX: #{year_hex}\n'
                                           f'✨ RGB: {year_rgb}\n'
                                           f'✨ CMYK: {year_cmyk}\n\n'
-                                          f'⛓️ {ans_url}{year_hex}\n'
+                                          f'🔗 {ans_url}{year_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                                   reply_markup=main_keyboard)
 
@@ -426,7 +436,7 @@ async def process_rgb_command(message: Message, state: FSMContext):
                                           f'✨ HEX: #{response_hex}\n'
                                           f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                           f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'🔗 {ans_url}{response_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
                 await state.clear()
@@ -440,7 +450,7 @@ async def process_rgb_command(message: Message, state: FSMContext):
                     f'✨ HEX: #{response_hex}\n'
                     f'✨ RGB: {response_r} {response_g} {response_b}\n'
                     f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'🔗 {ans_url}{response_hex}\n'
                     f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
                 await state.clear()
@@ -496,7 +506,7 @@ async def process_hex_command(message: Message, state: FSMContext):
                                           f'✨ HEX: #{response_hex}\n'
                                           f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                           f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'🔗 {ans_url}{response_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
                 await state.clear()
@@ -510,7 +520,7 @@ async def process_hex_command(message: Message, state: FSMContext):
                     f'✨ HEX: #{response_hex}\n'
                     f'✨ RGB: {response_r} {response_g} {response_b}\n'
                     f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'🔗 {ans_url}{response_hex}\n'
                     f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
                 await state.clear()
@@ -566,7 +576,7 @@ async def process_cmyk_command(message: Message, state: FSMContext):
                                           f'✨ HEX: #{response_hex}\n'
                                           f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                           f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'🔗 {ans_url}{response_hex}\n'
                                           f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
                 await state.clear()
@@ -580,7 +590,7 @@ async def process_cmyk_command(message: Message, state: FSMContext):
                     f'✨ HEX: #{response_hex}\n'
                     f'✨ RGB: {response_r} {response_g} {response_b}\n'
                     f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'🔗 {ans_url}{response_hex}\n'
                     f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
                 await state.clear()
@@ -667,7 +677,7 @@ async def inline_mode(inline_query: InlineQuery):
                         caption=f'✨ HEX: #{response_hex}\n'
                                 f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                 f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                f'⛓️ {ans_url}{response_hex}\n'
+                                f'🔗 {ans_url}{response_hex}\n'
                                 f'📤 t.me/{bot_info.username}/?start=hex_{response_hex}',
                         title=f'С фото',
                         description=f'HEX: #{response_hex}\n'
@@ -682,7 +692,7 @@ async def inline_mode(inline_query: InlineQuery):
                                 message_text=f'✨ HEX: #{response_hex}\n'
                                              f'✨ RGB: {response_r} {response_g} {response_b}\n'
                                              f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                             f'⛓️ {ans_url}{response_hex}\n'
+                                             f'🔗 {ans_url}{response_hex}\n'
                                              f'📤 t.me/{bot_info.username}/?start=hex_{response_hex}'),
                             hide_url=True,
                             description=f'HEX: #{response_hex}\n'
@@ -700,7 +710,7 @@ async def inline_mode(inline_query: InlineQuery):
                                 f'✨ HEX: #{year_hex}\n'
                                 f'✨ RGB: {year_rgb}\n'
                                 f'✨ CMYK: {year_cmyk}\n\n'
-                                f'⛓️ {ans_url}{year_hex}\n'
+                                f'🔗 {ans_url}{year_hex}\n'
                                 f'📤 t.me/{bot_info.username}/?start=year',
                         title=f'С фото',
                         description=f'Pantone: {year_pantone}\n'
@@ -717,7 +727,7 @@ async def inline_mode(inline_query: InlineQuery):
                                              f'✨ HEX: #{year_hex}\n'
                                              f'✨ RGB: {year_rgb}\n'
                                              f'✨ CMYK: {year_cmyk}\n\n'
-                                             f'⛓️ {ans_url}{year_hex}\n'
+                                             f'🔗 {ans_url}{year_hex}\n'
                                              f'📤 t.me/{bot_info.username}/?start=year'),
                             hide_url=True,
                             description=f'Pantone: {year_pantone}\n'
@@ -726,7 +736,11 @@ async def inline_mode(inline_query: InlineQuery):
                                         f'CMYK: {year_cmyk}'
                         )])
 
-        except UnboundLocalError or ValueError or IndexError:
+        except UnboundLocalError:
+            pass
+        except ValueError:
+            pass
+        except IndexError:
             pass
         except Exception as e:
             await bot.send_message(ADMIN_ID,
