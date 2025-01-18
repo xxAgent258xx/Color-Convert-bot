@@ -1,10 +1,9 @@
 import asyncio
 import logging
-# from json import loads
 
 import aiohttp
 from aiogram import Bot, Dispatcher, F
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.exceptions import *
 from aiogram.enums.inline_query_result_type import InlineQueryResultType
 from aiogram.types import Message, FSInputFile, BufferedInputFile, ReplyKeyboardMarkup, KeyboardButton, \
@@ -55,17 +54,92 @@ main_keyboard = ReplyKeyboardMarkup(keyboard=[
 # Приветственное сообщение
 @dp.message(F.text == '🔙 Главное меню')
 @dp.message(Command(commands=['start']))
-async def process_start_command(message: Message):
+async def process_start_command(message: Message, command: CommandObject):
     bot_info = await bot.get_me()
-    await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
-                        'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
-                        f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
-                        'Например: 🔍\n'
-                        '/hex FFFFFF\n'
-                        '/rgb 255 255 255\n'
-                        f'@{bot_info.username} cmyk 0 0 0 0',
-                        reply_markup=main_keyboard
-                        )
+    args = command.args.split('_')
+    if not args:
+        await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
+                            'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
+                            f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
+                            'Например: 🔍\n'
+                            '/hex FFFFFF\n'
+                            '/rgb 255 255 255\n'
+                            f'@{bot_info.username} cmyk 0 0 0 0',
+                            reply_markup=main_keyboard
+                            )
+    else:
+        if args[0].lower() == 'year':
+            await message.reply_photo(photo=FSInputFile('year.png'),
+                                      caption=f'✨Pantone: {year_pantone}\n'
+                                              f'✨HEX: #{year_hex}\n'
+                                              f'✨RGB: {year_rgb}\n'
+                                              f'✨CMYK: {year_cmyk}\n'
+                                              f'✨{ans_url}{year_hex}\n'
+                                              f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}',
+                                      reply_markup=main_keyboard)
+        else:
+            if args[0].lower() == 'rgb':
+                r, g, b = args[1], args[2], args[3]
+                if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
+                            response = await response_.json()
+                        async with session.get(
+                                f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                            photo = await response_2.content.read()
+
+            elif args[0].lower() == 'hex':
+                hex = args[1]
+                if len(hex) == 6 or len(hex) == 3:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'{api_url}hex={hex}') as response_:
+                            response = await response_.json()
+                        async with session.get(
+                                f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                            photo = await response_2.content.read()
+
+            elif args[0].lower() == 'cmyk':
+                c, m, y, k = args[1], args[2], args[3], args[4]
+                if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'{api_url}cmyk=cmyk({c},{m},{y},{k})') as response_:
+                            response = await response_.json()
+                        async with session.get(
+                                f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                            photo = await response_2.content.read()
+
+            response_hex = str(response['hex']['clean']).upper()
+            response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
+            response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
+            response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
+            response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
+            response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
+            response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
+            response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
+            try:
+                await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'), caption=
+                f'✨HEX: #{response_hex}\n'
+                f'✨RGB: {response_r} {response_g} {response_b}\n'
+                f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                f'✨{ans_url}{response_hex}\n'
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+            except TelegramBadRequest as e:
+                await bot.send_message(ADMIN_ID,
+                                       f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+                await message.reply(
+                    'Telegram не смог отправить изображение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
+                    reply_markup=main_keyboard)
+                await message.reply(
+                    f'✨HEX: #{response_hex}\n'
+                    f'✨RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                    f'✨{ans_url}{response_hex}\n'
+                    f'✨Поделиться: t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+
+            except Exception as e:
+                await bot.send_message(ADMIN_ID,
+                                       f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
+                await message.reply('Непредвиденная ошибка❌', reply_markup=main_keyboard)
 
 
 # Полный список команд
@@ -88,6 +162,7 @@ async def process_help_command(message: Message):
 # Команда "/hex hex", где hex - 3 или 6 символов от 0 до 9 и от A до F
 @dp.message(Command(commands=['hex']))
 async def process_hex_command(message: Message):
+    bot_info = await bot.get_me()
     hex = None
     try:
         # Чтение сообщения
@@ -123,7 +198,8 @@ async def process_hex_command(message: Message):
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                f'✨{ans_url}{response_hex}\n'
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -135,7 +211,8 @@ async def process_hex_command(message: Message):
                     f'✨HEX: #{response_hex}\n'
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                    f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                    f'✨{ans_url}{response_hex}\n'
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
 
             except Exception as e:
                 # Владелец узнаёт у кого произошла ошибка и какая
@@ -152,6 +229,7 @@ async def process_hex_command(message: Message):
 @dp.message(Command(commands=['rgb']))
 # Структура каждой функции одинакова, см. комментарии сверху
 async def process_rgb_command(message: Message):
+    bot_info = await bot.get_me()
     r, g, b = None, None, None
     try:
         _, r, g, b = message.text.split()
@@ -180,7 +258,8 @@ async def process_rgb_command(message: Message):
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                f'✨{ans_url}{response_hex}\n'
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -192,7 +271,8 @@ async def process_rgb_command(message: Message):
                     f'✨HEX: #{response_hex}\n'
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                    f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                    f'✨{ans_url}{response_hex}\n'
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
 
             except Exception as e:
                 await bot.send_message(ADMIN_ID,
@@ -207,6 +287,7 @@ async def process_rgb_command(message: Message):
 # Команда "/cmyk c m y k", где c,m,y,k - числа от 0 до 100
 @dp.message(Command(commands=['cmyk']))
 async def process_cmyk_command(message: Message):
+    bot_info = await bot.get_me()
     c, m, y, k = None, None, None, None
     try:
         _, c, m, y, k = message.text.split()
@@ -234,7 +315,8 @@ async def process_cmyk_command(message: Message):
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                f'✨{ans_url}{response_hex}\n'
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -245,7 +327,8 @@ async def process_cmyk_command(message: Message):
                     f'✨HEX: #{response_hex}\n'
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                    f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                    f'✨{ans_url}{response_hex}\n'
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
 
             except Exception as e:
                 await bot.send_message(ADMIN_ID,
@@ -284,6 +367,7 @@ async def button_rgb(message: Message, state: FSMContext):
 
 @dp.message(RGBForm.count)
 async def process_rgb_command(message: Message, state: FSMContext):
+    bot_info = await bot.get_me()
     r, g, b = False, False, False
     try:
         # Теперь значения читаются не из сообщения, а из машины состояний
@@ -314,7 +398,8 @@ async def process_rgb_command(message: Message, state: FSMContext):
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                f'✨{ans_url}{response_hex}\n'
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -326,7 +411,8 @@ async def process_rgb_command(message: Message, state: FSMContext):
                     f'✨HEX: #{response_hex}\n'
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                    f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                    f'✨{ans_url}{response_hex}\n'
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
                 await state.clear()
 
             except Exception as e:
@@ -348,6 +434,7 @@ async def button_hex(message: Message, state: FSMContext):
 
 @dp.message(HEXForm.count)
 async def process_hex_command(message: Message, state: FSMContext):
+    bot_info = await bot.get_me()
     hex = False
     try:
         form = await state.update_data(count=message.text)
@@ -378,7 +465,8 @@ async def process_hex_command(message: Message, state: FSMContext):
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                f'✨{ans_url}{response_hex}\n'
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -390,7 +478,8 @@ async def process_hex_command(message: Message, state: FSMContext):
                     f'✨HEX: #{response_hex}\n'
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                    f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                    f'✨{ans_url}{response_hex}\n'
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
                 await state.clear()
 
             except Exception as e:
@@ -413,6 +502,7 @@ async def button_cmyk(message: Message, state: FSMContext):
 
 @dp.message(CMYKForm.count)
 async def process_cmyk_command(message: Message, state: FSMContext):
+    bot_info = await bot.get_me()
     c, m, y, k = False, False, False, False
     try:
         form = await state.update_data(count=message.text)
@@ -442,7 +532,8 @@ async def process_cmyk_command(message: Message, state: FSMContext):
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                f'✨{ans_url}{response_hex}\n'
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -454,7 +545,8 @@ async def process_cmyk_command(message: Message, state: FSMContext):
                     f'✨HEX: #{response_hex}\n'
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                    f'✨{ans_url}{response_hex}', reply_markup=main_keyboard)
+                    f'✨{ans_url}{response_hex}\n'
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
                 await state.clear()
 
             except Exception as e:
@@ -477,6 +569,7 @@ async def hide_keyboard(message: Message):
 # Неотправленное сообщение вида "@botusername_bot system values", где system - rgb, hex, cmyk или year, values - r,g,b, hex или c,m,y,k в зависимости от system
 @dp.inline_query()
 async def inline_mode(inline_query: InlineQuery):
+    bot_info = await bot.get_me()
     check = True
     scheme = []
     query_id = ''
@@ -538,7 +631,8 @@ async def inline_mode(inline_query: InlineQuery):
                         caption=f'✨HEX: #{response_hex}\n'
                                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                f'✨{ans_url}{response_hex}',
+                                f'✨{ans_url}{response_hex}\n'
+                                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                         title=f'С фото',
                         description=f'HEX: #{response_hex}\n'
                                     f'RGB: {response_r} {response_g} {response_b}\n'
@@ -552,7 +646,8 @@ async def inline_mode(inline_query: InlineQuery):
                                 message_text=f'✨HEX: #{response_hex}\n'
                                              f'✨RGB: {response_r} {response_g} {response_b}\n'
                                              f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                             f'✨{ans_url}{response_hex}'),
+                                             f'✨{ans_url}{response_hex}\n'
+                                             f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}'),
                             hide_url=True,
                             description=f'HEX: #{response_hex}\n'
                                         f'RGB: {response_r} {response_g} {response_b}\n'
@@ -569,7 +664,8 @@ async def inline_mode(inline_query: InlineQuery):
                                 f'✨HEX: #{year_hex}\n'
                                 f'✨RGB: {year_rgb}\n'
                                 f'✨CMYK: {year_cmyk}\n'
-                                f'✨{ans_url}{year_hex}',
+                                f'✨{ans_url}{year_hex}\n'
+                                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}',
                         title=f'С фото',
                         description=f'Pantone: {year_pantone}\n'
                                     f'HEX: #{year_hex}\n'
@@ -585,7 +681,8 @@ async def inline_mode(inline_query: InlineQuery):
                                              f'✨HEX: #{year_hex}\n'
                                              f'✨RGB: {year_rgb}\n'
                                              f'✨CMYK: {year_cmyk}\n'
-                                             f'✨{ans_url}{year_hex}'),
+                                             f'✨{ans_url}{year_hex}\n'
+                                             f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}'),
                             hide_url=True,
                             description=f'Pantone: {year_pantone}\n'
                                         f'HEX: #{year_hex}\n'
