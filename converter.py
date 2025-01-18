@@ -53,6 +53,19 @@ main_keyboard = ReplyKeyboardMarkup(keyboard=[
 
 # Приветственное сообщение
 @dp.message(F.text == '🔙 Главное меню')
+async def process_start_button(message: Message):
+    bot_info = await bot.get_me()
+    await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
+                        'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
+                        f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
+                        'Например: 🔍\n'
+                        '/hex FFFFFF\n'
+                        '/rgb 255 255 255\n'
+                        f'@{bot_info.username} cmyk 0 0 0 0',
+                        reply_markup=main_keyboard
+                        )
+
+
 @dp.message(Command(commands=['start']))
 async def process_start_command(message: Message, command: CommandObject):
     bot_info = await bot.get_me()
