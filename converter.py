@@ -56,7 +56,10 @@ main_keyboard = ReplyKeyboardMarkup(keyboard=[
 @dp.message(Command(commands=['start']))
 async def process_start_command(message: Message, command: CommandObject):
     bot_info = await bot.get_me()
-    args = command.args.split('_')
+    if command.args:
+        args = command.args.split('_')
+    else:
+        args = False
     if not args:
         await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
                             'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
@@ -108,34 +111,33 @@ async def process_start_command(message: Message, command: CommandObject):
                                 f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
                             photo = await response_2.content.read()
 
-            response_hex = str(response['hex']['clean']).upper()
-            response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-            response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
-            response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
-            response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
-            response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
-            response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
-            response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
+                response_hex = str(response['hex']['clean']).upper()
+                response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
+                response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
+                response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
+                response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
+                response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
+                response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
+                response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
+
                 await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'), caption=
                 f'✨HEX: #{response_hex}\n'
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                 f'✨{ans_url}{response_hex}\n'
-                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
-            except TelegramBadRequest as e:
-                await bot.send_message(ADMIN_ID,
-                                       f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
-                await message.reply(
-                    'Telegram не смог отправить изображение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
-                    reply_markup=main_keyboard)
-                await message.reply(
-                    f'✨HEX: #{response_hex}\n'
-                    f'✨RGB: {response_r} {response_g} {response_b}\n'
-                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                    f'✨{ans_url}{response_hex}\n'
-                    f'✨Поделиться: t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
-
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          reply_markup=main_keyboard)
+            except UnboundLocalError or ValueError or IndexError:
+                await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
+                                    'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
+                                    f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
+                                    'Например: 🔍\n'
+                                    '/hex FFFFFF\n'
+                                    '/rgb 255 255 255\n'
+                                    f'@{bot_info.username} cmyk 0 0 0 0',
+                                    reply_markup=main_keyboard
+                                    )
             except Exception as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -199,7 +201,8 @@ async def process_hex_command(message: Message):
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                 f'✨{ans_url}{response_hex}\n'
-                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -212,7 +215,8 @@ async def process_hex_command(message: Message):
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                     f'✨{ans_url}{response_hex}\n'
-                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    reply_markup=main_keyboard)
 
             except Exception as e:
                 # Владелец узнаёт у кого произошла ошибка и какая
@@ -259,7 +263,8 @@ async def process_rgb_command(message: Message):
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                 f'✨{ans_url}{response_hex}\n'
-                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -272,7 +277,8 @@ async def process_rgb_command(message: Message):
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                     f'✨{ans_url}{response_hex}\n'
-                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    reply_markup=main_keyboard)
 
             except Exception as e:
                 await bot.send_message(ADMIN_ID,
@@ -316,7 +322,8 @@ async def process_cmyk_command(message: Message):
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                 f'✨{ans_url}{response_hex}\n'
-                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
@@ -328,7 +335,8 @@ async def process_cmyk_command(message: Message):
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                     f'✨{ans_url}{response_hex}\n'
-                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    reply_markup=main_keyboard)
 
             except Exception as e:
                 await bot.send_message(ADMIN_ID,
@@ -399,7 +407,8 @@ async def process_rgb_command(message: Message, state: FSMContext):
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                 f'✨{ans_url}{response_hex}\n'
-                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -412,7 +421,8 @@ async def process_rgb_command(message: Message, state: FSMContext):
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                     f'✨{ans_url}{response_hex}\n'
-                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    reply_markup=main_keyboard)
                 await state.clear()
 
             except Exception as e:
@@ -466,7 +476,8 @@ async def process_hex_command(message: Message, state: FSMContext):
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                 f'✨{ans_url}{response_hex}\n'
-                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -479,7 +490,8 @@ async def process_hex_command(message: Message, state: FSMContext):
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                     f'✨{ans_url}{response_hex}\n'
-                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    reply_markup=main_keyboard)
                 await state.clear()
 
             except Exception as e:
@@ -533,7 +545,8 @@ async def process_cmyk_command(message: Message, state: FSMContext):
                 f'✨RGB: {response_r} {response_g} {response_b}\n'
                 f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                 f'✨{ans_url}{response_hex}\n'
-                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -546,7 +559,8 @@ async def process_cmyk_command(message: Message, state: FSMContext):
                     f'✨RGB: {response_r} {response_g} {response_b}\n'
                     f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
                     f'✨{ans_url}{response_hex}\n'
-                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}', reply_markup=main_keyboard)
+                    f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    reply_markup=main_keyboard)
                 await state.clear()
 
             except Exception as e:
@@ -690,11 +704,7 @@ async def inline_mode(inline_query: InlineQuery):
                                         f'CMYK: {year_cmyk}'
                         )])
 
-        except UnboundLocalError:
-            pass
-        except ValueError:
-            pass
-        except IndexError:
+        except UnboundLocalError or ValueError or IndexError:
             pass
         except Exception as e:
             await bot.send_message(ADMIN_ID,
