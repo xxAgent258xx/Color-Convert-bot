@@ -86,12 +86,12 @@ async def process_start_command(message: Message, command: CommandObject):
     else:
         if args[0].lower() == 'year':
             await message.reply_photo(photo=FSInputFile('year.png'),
-                                      caption=f'✨Pantone: {year_pantone}\n'
-                                              f'✨HEX: #{year_hex}\n'
-                                              f'✨RGB: {year_rgb}\n'
-                                              f'✨CMYK: {year_cmyk}\n\n'
-                                              f'⛓️{ans_url}{year_hex}\n'
-                                              f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=year',
+                                      caption=f'✨ Pantone: {year_pantone}\n'
+                                              f'✨ HEX: #{year_hex}\n'
+                                              f'✨ RGB: {year_rgb}\n'
+                                              f'✨ CMYK: {year_cmyk}\n\n'
+                                              f'⛓️ {ans_url}{year_hex}\n'
+                                              f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                                       reply_markup=main_keyboard)
         else:
             if args[0].lower() == 'rgb':
@@ -136,11 +136,11 @@ async def process_start_command(message: Message, command: CommandObject):
 
                 await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
                                           caption=
-                                          f'✨HEX: #{response_hex}\n'
-                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️{ans_url}{response_hex}\n'
-                                          f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          f'✨ HEX: #{response_hex}\n'
+                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
             except UnboundLocalError or ValueError or IndexError:
                 await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
@@ -212,11 +212,11 @@ async def process_hex_command(message: Message):
                 # Отправка сообщения с фото
                 await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
                                           caption=
-                                          f'✨HEX: #{response_hex}\n'
-                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️{ans_url}{response_hex}\n'
-                                          f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          f'✨ HEX: #{response_hex}\n'
+                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -226,11 +226,11 @@ async def process_hex_command(message: Message):
                     reply_markup=main_keyboard)
                 # Отправка сообщения без фото, если изображение не было удачно сохранено(зависит от API фото)
                 await message.reply(
-                    f'✨HEX: #{response_hex}\n'
-                    f'✨RGB: {response_r} {response_g} {response_b}\n'
-                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️{ans_url}{response_hex}\n'
-                    f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    f'✨ HEX: #{response_hex}\n'
+                    f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
 
             except Exception as e:
@@ -275,11 +275,11 @@ async def process_rgb_command(message: Message):
             try:
                 await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
                                           caption=
-                                          f'✨HEX: #{response_hex}\n'
-                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️{ans_url}{response_hex}\n'
-                                          f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          f'✨ HEX: #{response_hex}\n'
+                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -289,11 +289,11 @@ async def process_rgb_command(message: Message):
                     'Telegram не смог отправить изображение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
                     reply_markup=main_keyboard)
                 await message.reply(
-                    f'✨HEX: #{response_hex}\n'
-                    f'✨RGB: {response_r} {response_g} {response_b}\n'
-                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️{ans_url}{response_hex}\n'
-                    f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    f'✨ HEX: #{response_hex}\n'
+                    f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
 
             except Exception as e:
@@ -335,11 +335,11 @@ async def process_cmyk_command(message: Message):
             try:
                 await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
                                           caption=
-                                          f'✨HEX: #{response_hex}\n'
-                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️{ans_url}{response_hex}\n'
-                                          f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          f'✨ HEX: #{response_hex}\n'
+                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
             except TelegramBadRequest as e:
                 await bot.send_message(ADMIN_ID,
@@ -348,11 +348,11 @@ async def process_cmyk_command(message: Message):
                     'Telegram не смог отправить изображение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
                     reply_markup=main_keyboard)
                 await message.reply(
-                    f'✨HEX: #{response_hex}\n'
-                    f'✨RGB: {response_r} {response_g} {response_b}\n'
-                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️{ans_url}{response_hex}\n'
-                    f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    f'✨ HEX: #{response_hex}\n'
+                    f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
 
             except Exception as e:
@@ -372,12 +372,12 @@ async def process_year_command(message: Message):
     bot_info = await bot.get_me()
     try:
         await message.reply_photo(photo=FSInputFile('year.png'),
-                                  caption=f'✨Pantone: {year_pantone}\n'
-                                          f'✨HEX: #{year_hex}\n'
-                                          f'✨RGB: {year_rgb}\n'
-                                          f'✨CMYK: {year_cmyk}\n\n'
-                                          f'⛓️{ans_url}{year_hex}\n'
-                                          f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=year',
+                                  caption=f'✨ Pantone: {year_pantone}\n'
+                                          f'✨ HEX: #{year_hex}\n'
+                                          f'✨ RGB: {year_rgb}\n'
+                                          f'✨ CMYK: {year_cmyk}\n\n'
+                                          f'⛓️ {ans_url}{year_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                                   reply_markup=main_keyboard)
 
     except Exception as e:
@@ -423,11 +423,11 @@ async def process_rgb_command(message: Message, state: FSMContext):
             try:
                 await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
                                           caption=
-                                          f'✨HEX: #{response_hex}\n'
-                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️{ans_url}{response_hex}\n'
-                                          f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          f'✨ HEX: #{response_hex}\n'
+                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
@@ -437,11 +437,11 @@ async def process_rgb_command(message: Message, state: FSMContext):
                     'Telegram не смог отправить изображение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
                     reply_markup=main_keyboard)
                 await message.reply(
-                    f'✨HEX: #{response_hex}\n'
-                    f'✨RGB: {response_r} {response_g} {response_b}\n'
-                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️{ans_url}{response_hex}\n'
-                    f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    f'✨ HEX: #{response_hex}\n'
+                    f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
                 await state.clear()
 
@@ -491,12 +491,13 @@ async def process_hex_command(message: Message, state: FSMContext):
             response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
             response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
             try:
-                await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'), caption=
-                f'✨HEX: #{response_hex}\n'
-                f'✨RGB: {response_r} {response_g} {response_b}\n'
-                f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                f'⛓️{ans_url}{response_hex}\n'
-                f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
+                                          caption=
+                                          f'✨ HEX: #{response_hex}\n'
+                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
@@ -506,11 +507,11 @@ async def process_hex_command(message: Message, state: FSMContext):
                     'Telegram не смог отправить изображение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
                     reply_markup=main_keyboard)
                 await message.reply(
-                    f'✨HEX: #{response_hex}\n'
-                    f'✨RGB: {response_r} {response_g} {response_b}\n'
-                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️{ans_url}{response_hex}\n'
-                    f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    f'✨ HEX: #{response_hex}\n'
+                    f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
                 await state.clear()
 
@@ -562,11 +563,11 @@ async def process_cmyk_command(message: Message, state: FSMContext):
             try:
                 await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
                                           caption=
-                                          f'✨HEX: #{response_hex}\n'
-                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'⛓️{ans_url}{response_hex}\n'
-                                          f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                          f'✨ HEX: #{response_hex}\n'
+                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                          f'⛓️ {ans_url}{response_hex}\n'
+                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                           reply_markup=main_keyboard)
                 await state.clear()
             except TelegramBadRequest as e:
@@ -576,11 +577,11 @@ async def process_cmyk_command(message: Message, state: FSMContext):
                     'Telegram не смог отправить изображение❌\nПопробуйте выполнить другой запрос, а затем повторить этот или выполните запрос позже.',
                     reply_markup=main_keyboard)
                 await message.reply(
-                    f'✨HEX: #{response_hex}\n'
-                    f'✨RGB: {response_r} {response_g} {response_b}\n'
-                    f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                    f'⛓️{ans_url}{response_hex}\n'
-                    f'📤t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                    f'✨ HEX: #{response_hex}\n'
+                    f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                    f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                    f'⛓️ {ans_url}{response_hex}\n'
+                    f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                     reply_markup=main_keyboard)
                 await state.clear()
 
@@ -663,11 +664,11 @@ async def inline_mode(inline_query: InlineQuery):
                         id=str(int(query_id) + 1),
                         photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
                         thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                        caption=f'✨HEX: #{response_hex}\n'
-                                f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                f'⛓️{ans_url}{response_hex}\n'
-                                f'📤t.me/{bot_info.username}/?start=hex_{response_hex}',
+                        caption=f'✨ HEX: #{response_hex}\n'
+                                f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                f'⛓️ {ans_url}{response_hex}\n'
+                                f'📤 t.me/{bot_info.username}/?start=hex_{response_hex}',
                         title=f'С фото',
                         description=f'HEX: #{response_hex}\n'
                                     f'RGB: {response_r} {response_g} {response_b}\n'
@@ -678,11 +679,11 @@ async def inline_mode(inline_query: InlineQuery):
                             type=InlineQueryResultType.ARTICLE,
                             title=f'Без фото',
                             input_message_content=InputTextMessageContent(
-                                message_text=f'✨HEX: #{response_hex}\n'
-                                             f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                             f'⛓️{ans_url}{response_hex}\n'
-                                             f'📤t.me/{bot_info.username}/?start=hex_{response_hex}'),
+                                message_text=f'✨ HEX: #{response_hex}\n'
+                                             f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                             f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                             f'⛓️ {ans_url}{response_hex}\n'
+                                             f'📤 t.me/{bot_info.username}/?start=hex_{response_hex}'),
                             hide_url=True,
                             description=f'HEX: #{response_hex}\n'
                                         f'RGB: {response_r} {response_g} {response_b}\n'
@@ -695,12 +696,12 @@ async def inline_mode(inline_query: InlineQuery):
                         id=str(int(query_id) + 1),
                         photo_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
                         thumbnail_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
-                        caption=f'✨Pantone: {year_pantone}\n'
-                                f'✨HEX: #{year_hex}\n'
-                                f'✨RGB: {year_rgb}\n'
-                                f'✨CMYK: {year_cmyk}\n\n'
-                                f'⛓️{ans_url}{year_hex}\n'
-                                f'📤t.me/{bot_info.username}/?start=year',
+                        caption=f'✨ Pantone: {year_pantone}\n'
+                                f'✨ HEX: #{year_hex}\n'
+                                f'✨ RGB: {year_rgb}\n'
+                                f'✨ CMYK: {year_cmyk}\n\n'
+                                f'⛓️ {ans_url}{year_hex}\n'
+                                f'📤 t.me/{bot_info.username}/?start=year',
                         title=f'С фото',
                         description=f'Pantone: {year_pantone}\n'
                                     f'HEX: #{year_hex}\n'
@@ -712,12 +713,12 @@ async def inline_mode(inline_query: InlineQuery):
                             type=InlineQueryResultType.ARTICLE,
                             title=f'Без фото',
                             input_message_content=InputTextMessageContent(
-                                message_text=f'✨Pantone: {year_pantone}\n'
-                                             f'✨HEX: #{year_hex}\n'
-                                             f'✨RGB: {year_rgb}\n'
-                                             f'✨CMYK: {year_cmyk}\n\n'
-                                             f'⛓️{ans_url}{year_hex}\n'
-                                             f'📤t.me/{bot_info.username}/?start=year'),
+                                message_text=f'✨ Pantone: {year_pantone}\n'
+                                             f'✨ HEX: #{year_hex}\n'
+                                             f'✨ RGB: {year_rgb}\n'
+                                             f'✨ CMYK: {year_cmyk}\n\n'
+                                             f'⛓️ {ans_url}{year_hex}\n'
+                                             f'📤 t.me/{bot_info.username}/?start=year'),
                             hide_url=True,
                             description=f'Pantone: {year_pantone}\n'
                                         f'HEX: #{year_hex}\n'
