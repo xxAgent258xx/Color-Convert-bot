@@ -527,71 +527,71 @@ async def inline_mode(inline_query: InlineQuery):
                 response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
                 response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
                 response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
-                await bot.answer_inline_query(query_id,
-                                              # Ответы в inline-режиме состоят из отправляемого сообщения и их вида на предпросмотре
-                                              [InlineQueryResultPhoto(
-                                                  type=InlineQueryResultType.PHOTO,
-                                                  # id для каждого ответа должен быть уникальным (для конкретного бота, необязательно для всех), для этого удобно использовать id запроса, т.к. он изначально уникальный
-                                                  id=str(int(query_id) + 1),
-                                                  photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                  thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
-                                                  caption=f'✨HEX: #{response_hex}\n'
-                                                          f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                          f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                          f'✨{ans_url}{response_hex}',
-                                                  title=f'С фото',
-                                                  description=f'HEX: #{response_hex}\n'
-                                                              f'RGB: {response_r} {response_g} {response_b}\n'
-                                                              f'CMYK: {response_c} {response_m} {response_y} {response_k}'
-                                              ),
-                                                  InlineQueryResultArticle(
-                                                      id=str(int(query_id) + 2),
-                                                      type=InlineQueryResultType.ARTICLE,
-                                                      title=f'Без фото',
-                                                      input_message_content=InputTextMessageContent(
-                                                          message_text=f'✨HEX: #{response_hex}\n'
-                                                                       f'✨RGB: {response_r} {response_g} {response_b}\n'
-                                                                       f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
-                                                                       f'✨{ans_url}{response_hex}'),
-                                                      hide_url=True,
-                                                      description=f'HEX: #{response_hex}\n'
-                                                                  f'RGB: {response_r} {response_g} {response_b}\n'
-                                                                  f'CMYK: {response_c} {response_m} {response_y} {response_k}',
-                                                  )])
+                await inline_query.answer(
+                    # Ответы в inline-режиме состоят из отправляемого сообщения и их вида на предпросмотре
+                    [InlineQueryResultPhoto(
+                        type=InlineQueryResultType.PHOTO,
+                        # id для каждого ответа должен быть уникальным (для конкретного бота, необязательно для всех), для этого удобно использовать id запроса, т.к. он изначально уникальный
+                        id=str(int(query_id) + 1),
+                        photo_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                        thumbnail_url=f'{ans_pic}{response_hex}/{response_hex}.jpeg',
+                        caption=f'✨HEX: #{response_hex}\n'
+                                f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                f'✨{ans_url}{response_hex}',
+                        title=f'С фото',
+                        description=f'HEX: #{response_hex}\n'
+                                    f'RGB: {response_r} {response_g} {response_b}\n'
+                                    f'CMYK: {response_c} {response_m} {response_y} {response_k}'
+                    ),
+                        InlineQueryResultArticle(
+                            id=str(int(query_id) + 2),
+                            type=InlineQueryResultType.ARTICLE,
+                            title=f'Без фото',
+                            input_message_content=InputTextMessageContent(
+                                message_text=f'✨HEX: #{response_hex}\n'
+                                             f'✨RGB: {response_r} {response_g} {response_b}\n'
+                                             f'✨CMYK: {response_c} {response_m} {response_y} {response_k}\n'
+                                             f'✨{ans_url}{response_hex}'),
+                            hide_url=True,
+                            description=f'HEX: #{response_hex}\n'
+                                        f'RGB: {response_r} {response_g} {response_b}\n'
+                                        f'CMYK: {response_c} {response_m} {response_y} {response_k}',
+                        )])
             elif scheme[0].lower() == 'year':
-                await bot.answer_inline_query(query_id,
-                                              [InlineQueryResultPhoto(
-                                                  type=InlineQueryResultType.PHOTO,
-                                                  id=str(int(query_id) + 1),
-                                                  photo_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
-                                                  thumbnail_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
-                                                  caption=f'✨Pantone: {year_pantone}\n'
-                                                          f'✨HEX: #{year_hex}\n'
-                                                          f'✨RGB: {year_rgb}\n'
-                                                          f'✨CMYK: {year_cmyk}\n'
-                                                          f'✨{ans_url}{year_hex}',
-                                                  title=f'С фото',
-                                                  description=f'Pantone: {year_pantone}\n'
-                                                              f'HEX: #{year_hex}\n'
-                                                              f'RGB: {year_rgb}\n'
-                                                              f'CMYK: {year_cmyk}'
-                                              ),
-                                                  InlineQueryResultArticle(
-                                                      id=str(int(query_id) + 2),
-                                                      type=InlineQueryResultType.ARTICLE,
-                                                      title=f'Без фото',
-                                                      input_message_content=InputTextMessageContent(
-                                                          message_text=f'✨Pantone: {year_pantone}\n'
-                                                                       f'✨HEX: #{year_hex}\n'
-                                                                       f'✨RGB: {year_rgb}\n'
-                                                                       f'✨CMYK: {year_cmyk}\n'
-                                                                       f'✨{ans_url}{year_hex}'),
-                                                      hide_url=True,
-                                                      description=f'Pantone: {year_pantone}\n'
-                                                                  f'HEX: #{year_hex}\n'
-                                                                  f'RGB: {year_rgb}\n'
-                                                                  f'CMYK: {year_cmyk}'
-                                                  )])
+                await inline_query.answer(
+                    [InlineQueryResultPhoto(
+                        type=InlineQueryResultType.PHOTO,
+                        id=str(int(query_id) + 1),
+                        photo_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
+                        thumbnail_url=f'{ans_pic}{year_hex}/{year_hex}.jpeg',
+                        caption=f'✨Pantone: {year_pantone}\n'
+                                f'✨HEX: #{year_hex}\n'
+                                f'✨RGB: {year_rgb}\n'
+                                f'✨CMYK: {year_cmyk}\n'
+                                f'✨{ans_url}{year_hex}',
+                        title=f'С фото',
+                        description=f'Pantone: {year_pantone}\n'
+                                    f'HEX: #{year_hex}\n'
+                                    f'RGB: {year_rgb}\n'
+                                    f'CMYK: {year_cmyk}'
+                    ),
+                        InlineQueryResultArticle(
+                            id=str(int(query_id) + 2),
+                            type=InlineQueryResultType.ARTICLE,
+                            title=f'Без фото',
+                            input_message_content=InputTextMessageContent(
+                                message_text=f'✨Pantone: {year_pantone}\n'
+                                             f'✨HEX: #{year_hex}\n'
+                                             f'✨RGB: {year_rgb}\n'
+                                             f'✨CMYK: {year_cmyk}\n'
+                                             f'✨{ans_url}{year_hex}'),
+                            hide_url=True,
+                            description=f'Pantone: {year_pantone}\n'
+                                        f'HEX: #{year_hex}\n'
+                                        f'RGB: {year_rgb}\n'
+                                        f'CMYK: {year_cmyk}'
+                        )])
 
         except UnboundLocalError:
             pass
