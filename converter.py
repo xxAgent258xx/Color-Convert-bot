@@ -352,13 +352,15 @@ async def process_cmyk_command(message: Message):
 @dp.message(F.text == '🌈Цвет 2025 года')
 @dp.message(Command(commands=['year']))
 async def process_year_command(message: Message):
+    bot_info = await bot.get_me()
     try:
         await message.reply_photo(photo=FSInputFile('year.png'),
                                   caption=f'✨Pantone: {year_pantone}\n'
                                           f'✨HEX: #{year_hex}\n'
                                           f'✨RGB: {year_rgb}\n'
                                           f'✨CMYK: {year_cmyk}\n'
-                                          f'✨https://whatcolor.ru/color/{year_hex}',
+                                          f'✨{ans_url}{year_hex}\n'
+                                          f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}',
                                   reply_markup=main_keyboard)
 
     except Exception as e:
