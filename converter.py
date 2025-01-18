@@ -91,7 +91,7 @@ async def process_start_command(message: Message, command: CommandObject):
                                               f'✨RGB: {year_rgb}\n'
                                               f'✨CMYK: {year_cmyk}\n'
                                               f'✨{ans_url}{year_hex}\n'
-                                              f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}',
+                                              f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                                       reply_markup=main_keyboard)
         else:
             if args[0].lower() == 'rgb':
@@ -373,7 +373,7 @@ async def process_year_command(message: Message):
                                           f'✨RGB: {year_rgb}\n'
                                           f'✨CMYK: {year_cmyk}\n'
                                           f'✨{ans_url}{year_hex}\n'
-                                          f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}',
+                                          f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                                   reply_markup=main_keyboard)
 
     except Exception as e:
@@ -694,7 +694,7 @@ async def inline_mode(inline_query: InlineQuery):
                                 f'✨RGB: {year_rgb}\n'
                                 f'✨CMYK: {year_cmyk}\n'
                                 f'✨{ans_url}{year_hex}\n'
-                                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}',
+                                f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                         title=f'С фото',
                         description=f'Pantone: {year_pantone}\n'
                                     f'HEX: #{year_hex}\n'
@@ -711,7 +711,7 @@ async def inline_mode(inline_query: InlineQuery):
                                              f'✨RGB: {year_rgb}\n'
                                              f'✨CMYK: {year_cmyk}\n'
                                              f'✨{ans_url}{year_hex}\n'
-                                             f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{year_hex}'),
+                                             f'✨Поделиться: t.me/share/url?url=t.me/{bot_info.username}/?start=year'),
                             hide_url=True,
                             description=f'Pantone: {year_pantone}\n'
                                         f'HEX: #{year_hex}\n'
