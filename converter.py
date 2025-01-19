@@ -405,7 +405,7 @@ async def button_rgb(message: Message, state: FSMContext):
 @dp.message(RGBForm.count)
 async def process_rgb_command(message: Message, state: FSMContext):
     bot_info = await bot.get_me()
-    r, g, b = False, False, False
+    r, g, b = None, None, None
     try:
         # Теперь значения читаются не из сообщения, а из машины состояний
         form = await state.update_data(count=message.text)
@@ -414,7 +414,7 @@ async def process_rgb_command(message: Message, state: FSMContext):
         await message.reply('Вы ввели неверное количество значений❌\nRGB-значение состоит из 3 чисел от 0 до 255.',
                             reply_markup=main_keyboard)
         await state.clear()
-    if r != False and g != False and b != False:
+    if r != None and g != None and b != None:
         if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
@@ -475,7 +475,7 @@ async def button_hex(message: Message, state: FSMContext):
 @dp.message(HEXForm.count)
 async def process_hex_command(message: Message, state: FSMContext):
     bot_info = await bot.get_me()
-    hex = False
+    hex = None
     try:
         form = await state.update_data(count=message.text)
         hex = form['count']
@@ -484,7 +484,7 @@ async def process_hex_command(message: Message, state: FSMContext):
             'Вы ввели неверное количество значений❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.',
             reply_markup=main_keyboard)
         await state.clear()
-    if hex != False:
+    if hex != None:
         if len(hex) == 6 or len(hex) == 3:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'{api_url}hex={hex}') as response_:
@@ -546,7 +546,7 @@ async def button_cmyk(message: Message, state: FSMContext):
 @dp.message(CMYKForm.count)
 async def process_cmyk_command(message: Message, state: FSMContext):
     bot_info = await bot.get_me()
-    c, m, y, k = False, False, False, False
+    c, m, y, k = None, None, None, None
     try:
         form = await state.update_data(count=message.text)
         c, m, y, k = map(int, form['count'].split())
@@ -554,7 +554,7 @@ async def process_cmyk_command(message: Message, state: FSMContext):
         await message.reply('Вы ввели неверное количество значений❌\nCMYK-значение состоит из 4 чисел от 0 до 100.',
                             reply_markup=main_keyboard)
         await state.clear()
-    if c != False and m != False and y != False and k != False:
+    if c != None and m != None and y != None and k != None:
         if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'{api_url}cmyk={c},{m},{y},{k}') as response_:
