@@ -96,7 +96,7 @@ async def process_start_command(message: Message, command: CommandObject):
                                       reply_markup=main_keyboard)
             check = False
         else:
-            if args[0].lower() == 'rgb':
+            if args[0].lower() == 'rgb' and len(args) >= 4:
                 r, g, b = args[1], args[2], args[3]
                 if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
                     async with aiohttp.ClientSession() as session:
@@ -106,7 +106,7 @@ async def process_start_command(message: Message, command: CommandObject):
                                 f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
                             photo = await response_2.content.read()
 
-            elif args[0].lower() == 'hex':
+            elif args[0].lower() == 'hex' and len(args) >= 2:
                 hex = args[1]
                 if len(hex) == 6 or len(hex) == 3:
                     async with aiohttp.ClientSession() as session:
@@ -116,7 +116,7 @@ async def process_start_command(message: Message, command: CommandObject):
                                 f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
                             photo = await response_2.content.read()
 
-            elif args[0].lower() == 'cmyk':
+            elif args[0].lower() == 'cmyk' and len(args) >= 5:
                 c, m, y, k = args[1], args[2], args[3], args[4]
                 if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
                     async with aiohttp.ClientSession() as session:
