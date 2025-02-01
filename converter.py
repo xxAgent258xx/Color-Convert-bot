@@ -146,6 +146,16 @@ async def process_start_command(message: Message, command: CommandObject):
                                               f'🔗 {ans_url}{response_hex}\n'
                                               f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
                                               reply_markup=main_keyboard)
+                else:
+                    await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
+                                        'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
+                                        f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
+                                        'Например: 🔍\n'
+                                        '/hex FFFFFF\n'
+                                        '/rgb 255 255 255\n'
+                                        f'@{bot_info.username} cmyk 0 0 0 0',
+                                        reply_markup=main_keyboard
+                                        )
             except ValueError:
                 await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
                                     'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
