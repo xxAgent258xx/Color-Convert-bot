@@ -1,4 +1,4 @@
-import asyncio
+vimport asyncio
 import logging
 
 import aiohttp
@@ -69,6 +69,7 @@ async def process_start_button(message: Message):
 @dp.message(Command(commands=['start']))
 async def process_start_command(message: Message, command: CommandObject):
     bot_info = await bot.get_me()
+    check = True
     if command.args:
         args = command.args.split('_')
     else:
@@ -93,6 +94,7 @@ async def process_start_command(message: Message, command: CommandObject):
                                               f'🔗 {ans_url}{year_hex}\n'
                                               f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=year',
                                       reply_markup=main_keyboard)
+            check = False
         else:
             if args[0].lower() == 'rgb':
                 r, g, b = args[1], args[2], args[3]
@@ -123,25 +125,27 @@ async def process_start_command(message: Message, command: CommandObject):
                         async with session.get(
                                 f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
                             photo = await response_2.content.read()
-
+            else:
+                check = False
             try:
-                response_hex = str(response['hex']['clean']).upper()
-                response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-                response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
-                response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
-                response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
-                response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
-                response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
-                response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
+                if check:
+                    response_hex = str(response['hex']['clean']).upper()
+                    response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
+                    response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
+                    response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
+                    response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
+                    response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
+                    response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
+                    response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
 
-                await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
-                                          caption=
-                                          f'✨ HEX: #{response_hex}\n'
-                                          f'✨ RGB: {response_r} {response_g} {response_b}\n'
-                                          f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
-                                          f'🔗 {ans_url}{response_hex}\n'
-                                          f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
-                                          reply_markup=main_keyboard)
+                    await message.reply_photo(photo=BufferedInputFile(photo, 'output.png'),
+                                              caption=
+                                              f'✨ HEX: #{response_hex}\n'
+                                              f'✨ RGB: {response_r} {response_g} {response_b}\n'
+                                              f'✨ CMYK: {response_c} {response_m} {response_y} {response_k}\n\n'
+                                              f'🔗 {ans_url}{response_hex}\n'
+                                              f'📤 t.me/share/url?url=t.me/{bot_info.username}/?start=hex_{response_hex}',
+                                              reply_markup=main_keyboard)
             except ValueError:
                 await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
                                     'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
