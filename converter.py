@@ -162,6 +162,16 @@ async def process_start_command(message: Message, command: CommandObject):
                                     f'@{bot_info.username} cmyk 0 0 0 0',
                                     reply_markup=main_keyboard
                                     )
+            except UnboundLocalError:
+                await message.reply('Добро пожаловать в бота для конвертации цветов! 👋\n\n'
+                                    'Нажмите на кнопку снизу, а затем введите значения⌨️\n'
+                                    f'Или напишите / или @{bot_info.username}, цветовую модель, а затем значения✍️\n\n'
+                                    'Например: 🔍\n'
+                                    '/hex FFFFFF\n'
+                                    '/rgb 255 255 255\n'
+                                    f'@{bot_info.username} cmyk 0 0 0 0',
+                                    reply_markup=main_keyboard
+                                    )
             except Exception as e:
                 await bot.send_message(ADMIN_ID,
                                        f'{'@' + message.from_user.username if message.from_user.username else 'tg://openmessage?user_id=' + str(message.from_user.id)}\n{e}')
