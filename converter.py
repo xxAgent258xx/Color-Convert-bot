@@ -1,4 +1,4 @@
-vimport asyncio
+import asyncio
 import logging
 
 import aiohttp
@@ -98,13 +98,16 @@ async def process_start_command(message: Message, command: CommandObject):
         else:
             if args[0].lower() == 'rgb' and len(args) >= 4:
                 r, g, b = args[1], args[2], args[3]
-                if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
-                            response = await response_.json()
-                        async with session.get(
-                                f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
-                            photo = await response_2.content.read()
+                if r != '' and g != '' and b != '':
+                    if 0 <= int(r) <= 255 and 0 <= int(g) <= 255 and 0 <= int(b) <= 255:
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'{api_url}rgb=rgb({r},{g},{b})') as response_:
+                                response = await response_.json()
+                            async with session.get(
+                                    f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                                photo = await response_2.content.read()
+                else:
+                    check = False
 
             elif args[0].lower() == 'hex' and len(args) >= 2:
                 hex = args[1]
@@ -115,16 +118,21 @@ async def process_start_command(message: Message, command: CommandObject):
                         async with session.get(
                                 f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
                             photo = await response_2.content.read()
+                else:
+                    check = False
 
             elif args[0].lower() == 'cmyk' and len(args) >= 5:
                 c, m, y, k = args[1], args[2], args[3], args[4]
-                if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(f'{api_url}cmyk=cmyk({c},{m},{y},{k})') as response_:
-                            response = await response_.json()
-                        async with session.get(
-                                f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
-                            photo = await response_2.content.read()
+                if c != '' and m != '' and y != '' and k != '':
+                    if 0 <= int(c) <= 100 and 0 <= int(m) <= 100 and 0 <= int(y) <= 100 and 0 <= int(k) <= 100:
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'{api_url}cmyk=cmyk({c},{m},{y},{k})') as response_:
+                                response = await response_.json()
+                            async with session.get(
+                                    f'{ans_pic}{str(response['hex']['clean']).upper()}/{str(response['hex']['clean']).upper()}.png') as response_2:
+                                photo = await response_2.content.read()
+                else:
+                    check = False
             else:
                 check = False
             try:
@@ -773,7 +781,8 @@ async def inline_mode(inline_query: InlineQuery):
 
 @dp.message()
 async def send_echo(message: Message):
-    await message.reply('Я вас не понимаю😔\nВведите или нажмите /start или /help, чтобы получить информацию.')
+    if message.chat.id == message.from_user.id:
+        await message.reply('Я вас не понимаю😔\nВведите или нажмите /start или /help, чтобы получить информацию.')
 
 
 async def on_startup():
