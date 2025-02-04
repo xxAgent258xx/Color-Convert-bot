@@ -3,12 +3,12 @@ import logging
 
 import aiohttp
 from aiogram import Bot, Dispatcher, F
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command, CommandObject, ChatMemberUpdatedFilter, JOIN_TRANSITION
 from aiogram.exceptions import *
 from aiogram.enums.inline_query_result_type import InlineQueryResultType
 from aiogram.types import Message, FSInputFile, BufferedInputFile, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove, InlineQuery, \
-    InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent
+    InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent, ChatMemberUpdated
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -777,6 +777,11 @@ async def inline_mode(inline_query: InlineQuery):
         except Exception as e:
             await bot.send_message(ADMIN_ID,
                                    f'{'@' + inline_query.from_user.username if inline_query.from_user.username else 'tg://openmessage?user_id=' + str(inline_query.from_user.id)}\n{e}')
+
+
+@dp.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=JOIN_TRANSITION))
+async def add_to_chat(chat: ChatMemberUpdated):
+    await bot.send_message(chat.chat.id, 'Спасибо, что добавили меня в чат! ☺️\nЧтобы я реагировал на кнопки и значения после них без прав администратора, отвечайте на мои сообщения.')
 
 
 @dp.message()
