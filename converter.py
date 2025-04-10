@@ -238,7 +238,7 @@ async def process_help_command(message: Message):
                         f'где R, G, B - числа от 0 до до 255;\n\n'
                         f'/cmyk C M Y K или @{bot_info.username} cmyk C M Y K,\n'
                         f'где C, M, Y, K - числа от 0 до 100;\n\n'
-                        f'/year YYYY или @{bot_info.username} year YYY,\n'
+                        f'/year YYYY или @{bot_info.username} year YYYY,\n'
                         f'где YYYY - год от 2000 до {now};',
                         reply_markup=main_keyboard
                         )
