@@ -249,10 +249,10 @@ async def process_help_command(message: Message):
 async def process_hex_command(message: Message):
     bot_info = await bot.get_me()
     hex = None
-    try:
+    if len(message.text.split()) == 2:
         # Чтение сообщения
         _, hex = message.text.split()
-    except ValueError:
+    else:
         await message.reply(
             'Вы ввели неверное количество значений❌\nHEX-значение состоит из 3 или 6 символов от 0 до 9 и от A до F.',
             reply_markup=main_keyboard)
@@ -315,9 +315,9 @@ async def process_hex_command(message: Message):
 async def process_rgb_command(message: Message):
     bot_info = await bot.get_me()
     r, g, b = None, None, None
-    try:
+    if len(message.text.split()) == 4:
         _, r, g, b = message.text.split()
-    except ValueError:
+    else:
         await message.reply('Вы ввели неверное количество значений❌\nRGB-значение состоит из 3 чисел от 0 до 255.',
                             reply_markup=main_keyboard)
     # "!= None" т.к. значение может быть равно 0, (if 0) = False, (if 0 != None) = True
@@ -374,9 +374,9 @@ async def process_rgb_command(message: Message):
 async def process_cmyk_command(message: Message):
     bot_info = await bot.get_me()
     c, m, y, k = None, None, None, None
-    try:
+    if len(message.text.split()) == 5:
         _, c, m, y, k = message.text.split()
-    except ValueError:
+    else:
         await message.reply('Вы ввели неверное количество значений❌\nCMYK-значение состоит из 4 чисел от 0 до 100.',
                             reply_markup=main_keyboard)
     if c != None and m != None and y != None and k != None:
@@ -723,14 +723,14 @@ async def inline_mode(inline_query: InlineQuery):
                 check = False
 
             if check and scheme[0].lower() != 'year' and response != 0:
-                response_hex = str(response['hex']['clean']).upper()
-                response_r = 0 if response['rgb']['r'] is None else response['rgb']['r']
-                response_g = 0 if response['rgb']['g'] is None else response['rgb']['g']
-                response_b = 0 if response['rgb']['b'] is None else response['rgb']['b']
-                response_c = 0 if response['cmyk']['c'] is None else response['cmyk']['c']
-                response_m = 0 if response['cmyk']['m'] is None else response['cmyk']['m']
-                response_y = 0 if response['cmyk']['y'] is None else response['cmyk']['y']
-                response_k = 0 if response['cmyk']['k'] is None else response['cmyk']['k']
+                response_hex = response[0]
+                response_r = response[1]
+                response_g = response[2]
+                response_b = response[3]
+                response_c = response[4]
+                response_m = response[5]
+                response_y = response[6]
+                response_k = response[7]
                 await inline_query.answer(
                     # Ответы в inline-режиме состоят из отправляемого сообщения и их вида на предпросмотре
                     [InlineQueryResultPhoto(
@@ -767,10 +767,8 @@ async def inline_mode(inline_query: InlineQuery):
             elif scheme[0].lower() == 'year':
                 ans = []
                 year = ''
-                try:
+                if len(scheme) >= 2:
                     year = scheme[1]
-                except ValueError:
-                    pass
                 now = list(year_pantone.keys())[-1]
                 if year.isnumeric():
                     if 2000 <= int(year) <= now:
